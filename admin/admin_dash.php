@@ -125,11 +125,12 @@
             <i class="fa-solid fa-shop"></i> Admin Kopi-Yuk
         </div>
         <ul class="sidebar-menu">
-            <li class="active"><a href="#" data-target="section-dashboard"><i class="fa-solid fa-chart-pie"></i> Ringkasan</a></li>
-            <li><a href="#" data-target="section-meja"><i class="fa-solid fa-chair"></i> Denah & Meja</a></li>
-            <li><a href="#" data-target="section-users"><i class="fa-solid fa-users"></i> Kelola User</a></li>
-            <li><a href="#" data-target="section-menu"><i class="fa-solid fa-utensils"></i> Menu & Harga</a></li>
-            <li><a href="#" data-target="section-laporan"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan</a></li>
+            <li class="active"><a href="#" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> Ringkasan</a></li>
+            <li><a href="#" data-target="meja"><i class="fa-solid fa-chair"></i> Denah & Meja</a></li>
+            <li><a href="#" data-target="users"><i class="fa-solid fa-users"></i> Kelola User</a></li>
+            <li><a href="#" data-target="menuharga"><i class="fa-solid fa-utensils"></i> Menu & Harga</a></li>
+            <li><a href="#" data-target="laporan"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan</a></li>
+            <li><a href="logout.php" data-target="logout"><i class="fa-solid fa-user"></i> Logout</a></li>
         </ul>
     </div>
     <!-- Overlay untuk klik di luar sidebar versi HP -->
@@ -150,26 +151,10 @@
         <div class="content-body">
             
             <!-- 1. SECTION: DASHBOARD / RINGKASAN -->
-            <div id="section-dashboard" class="page-section active">
-                <h1 class="page-title">Ringkasan Hari Ini</h1>
-                <div class="grid-stats">
-                    <div class="card-stat">
-                        <div class="stat-info"><h3>Pendapatan</h3><p>Rp 2.450.000</p></div>
-                        <div class="stat-icon bg-green-light"><i class="fa-solid fa-wallet"></i></div>
-                    </div>
-                    <div class="card-stat">
-                        <div class="stat-info"><h3>Pesanan Lunas</h3><p>42 Transaksi</p></div>
-                        <div class="stat-icon bg-blue-light"><i class="fa-solid fa-circle-check"></i></div>
-                    </div>
-                    <div class="card-stat">
-                        <div class="stat-info"><h3>Bayar Nanti (Pending)</h3><p id="stat-pending-meja">2 Meja</p></div>
-                        <div class="stat-icon bg-orange-light"><i class="fa-solid fa-clock"></i></div>
-                    </div>
-                </div>
-            </div>
+            <?php include 'modul/dashboard.php'; ?>
 
             <!-- 2. SECTION: MANAJEMEN MEJA -->
-            <div id="section-meja" class="page-section">
+            <div id="meja" class="page-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h1 class="page-title" style="margin: 0;">Manajemen & Status Meja</h1>
                     <button class="btn btn-primary" id="btn-tambah-meja"><i class="fa-solid fa-plus"></i> Tambah Meja</button>
@@ -230,7 +215,7 @@
             </div>
 
             <!-- 3. SECTION: MANAGEMENT USER -->
-            <div id="section-users" class="page-section">
+            <div id="users" class="page-section">
                 <h1 class="page-title">Management User & Hak Akses</h1>
                 <div class="card-table">
                     <div class="table-header">
@@ -276,7 +261,7 @@
             </div>
 
             <!-- 4. SECTION: MENU & HARGA -->
-            <div id="section-menu" class="page-section">
+            <div id="menuharga" class="page-section">
                 <h1 class="page-title">Kelola Daftar Menu & Harga</h1>
                 <div class="card-table">
                     <div class="table-header">
@@ -329,7 +314,7 @@
             </div>
 
             <!-- 5. SECTION: LAPORAN -->
-            <div id="section-laporan" class="page-section">
+            <div id="laporan" class="page-section">
                 <h1 class="page-title">Laporan Penjualan</h1>
                 <p style="color: var(--text-gray);">Fitur penarikan data laporan penjualan, eksport Excel, dan cetak omset berkala.</p>
             </div>
@@ -340,7 +325,7 @@
     <!-- SCRIPT LOGIKAL INTERAKSI -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
+       $(document).ready(function() {
             
             // 1. Logika Klik Menu Sidebar (Pindah Halaman Tanpa Reload)
             $('.sidebar-menu li a').on('click', function(e) {
@@ -349,14 +334,14 @@
                 $(this).parent().addClass('active');
                 
                 var targetSection = $(this).data('target');
-                $('.page-section').removeClass('active');
-                $('#' + targetSection).addClass('active');
+                alert(targetSection);
+                //$('.page-section').removeClass('active');
+                //$('#' + targetSection).addClass('active');
 
                 if($(window).width() <= 768) {
                     $('#sidebar').removeClass('open');
                 }
             });
-
             // 2. Tombol Toggle Sidebar Versi HP / Mobile
             $('#toggleBtn, #sidebarOverlay').on('click', function() {
                 $('#sidebar').toggleClass('open');
