@@ -1,0 +1,135 @@
+.form-modern {
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+   
+    margin: auto;
+}
+
+/* Group */
+.form-group {
+    margin-bottom: 2px;
+    display: flex;
+    flex-direction: column;
+	padding-bottom: 5px;
+}
+
+/* Label */
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #334155;
+}
+
+/* All text-like inputs */
+.form-modern input[type="text"],
+.form-modern input[type="password"],
+.form-modern input[type="email"],
+.form-modern input[type="number"],
+.form-modern input[type="date"],
+.form-modern input[type="datetime-local"],
+.form-modern input[type="time"],
+.form-modern input[type="search"],
+.form-modern input[type="tel"],
+.form-modern input[type="url"],
+.form-modern select,
+.form-modern textarea {
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    outline: none;
+    transition: 0.2s;
+	margin-bottom: 10px;
+}
+
+/* Textarea */
+.form-modern textarea {
+    min-height: 80px;
+    resize: vertical;
+	margin-bottom: 10px;
+}
+
+/* Focus effect */
+.form-modern input:focus,
+.form-modern select:focus,
+.form-modern textarea:focus {
+    border-color: #4f46e5;
+    background:#D3D3D3;
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+}
+
+/* File Input */
+.form-modern input[type="file"] {
+    font-size: 13px;
+    background: #f8fafc;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+	margin-bottom: 10px;
+}
+
+/* Checkbox & Radio Container */
+.check-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+	margin-bottom: 10px;
+}
+
+/* Custom Checkbox */
+.check-group input[type="checkbox"],
+.check-group input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #4f46e5;
+    cursor: pointer;
+}
+
+/* Range */
+.form-modern input[type="range"] {
+    width: 100%;
+    accent-color: #4f46e5;
+    cursor: pointer;
+	margin-bottom: 10px;
+}
+
+/* Color */
+.form-modern input[type="color"] {
+    height: 40px;
+    padding: 3px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+	margin-bottom: 10px;
+}
+
+/* Button */
+.btn-modern {
+   
+    padding: 12px;
+    border: none;
+    border-radius: 14px;
+    background: #4f46e5;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+	margin-bottom: 10px;
+}
+
+.btn-modern:hover {
+    background: #4338ca;
+}
+
+.btn-modern:active {
+    background: white !important;
+    color: #d3d3d3 !important;
+    transform: scale(0.97);
+}

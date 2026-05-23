@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- Meta tag wajib agar tampilan pas di layar HP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halaman Login Modern</title>
+    <title>Login User</title>
     <style>
         /* Reset & Base Styling */
         * {

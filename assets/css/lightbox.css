@@ -1,0 +1,74 @@
+/* CSS Document */
+/* Overlay */
+.lightbox{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    visibility:hidden;
+    transition:0.3s ease;
+    z-index:9999;
+}
+
+/* Active */
+.lightbox.active{
+    opacity:1;
+    visibility:visible;
+}
+
+/* Content hampir full */
+.lightbox-content{
+    background:#fff;
+    width:80%;
+    max-height:95%;
+    border-radius:20px;
+    padding:25px;
+    overflow-y:auto;
+    position:relative;
+    transform:scale(0.95);
+    transition:0.3s ease;
+}
+
+/* Animasi */
+.lightbox.active .lightbox-content{
+    transform:scale(1);
+}
+
+/* Close */
+.close-btn{
+    position:absolute;
+    top:15px;
+    right:20px;
+    font-size:24px;
+    cursor:pointer;
+    color:#888;
+}
+
+.close-btn:hover{
+    color:#000;
+}
+
+/* Scrollbar cantik */
+.lightbox-content::-webkit-scrollbar{
+    width:6px;
+}
+.lightbox-content::-webkit-scrollbar-thumb{
+    background:#ccc;
+    border-radius:10px;
+}
+
+/* Mobile khusus */
+@media(max-width:768px){
+    .lightbox-content{
+        width:95%;
+        max-height:80%;
+        border-radius:0;
+        padding:20px;
+    }
+}
+
+
