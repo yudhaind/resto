@@ -7,7 +7,26 @@
                 <!-- Container Denah Layout Meja -->
                 <div class="grid-meja" id="box-denah-meja">
                     
-                
+                <?php
+$sql="SELECT * FROM `tables`";
+$result=fetchAll($sql);
+foreach($result as $row){
+    $nomor_meja=$row['table_number'];
+    $id_meja=$row['id'];
+    $status_meja=$row['status']; 
+                ?>
+                    <!-- Meja 1 -->
+                    <div class="card-meja status-kosong" data-nomor="<?= $id_meja ?>">
+                        <div class="meja-actions">
+                            <button class="btn-action-meja edit" onclick="route('edit_meja', 'popupcontent', '1', 'true')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-action-meja delete btn-hapus-meja"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div class="meja-icon"><i class="fa-solid fa-couch meja-icon-color"></i></div>
+                        <div class="meja-name">Meja <?= $nomor_meja ?></div>
+                        <span class="status-indicator status-kosong">Kosong</span>
+                        <button class="btn btn-outline btn-sm btn-ubah-status">Isi Manual</button>
+                    </div>
+<?php } ?>
                     <!-- Meja 2 
                     <div class="card-meja status-kosong" data-nomor="2">
                         <div class="meja-actions">
@@ -52,7 +71,7 @@
      let nilaiLama = null; 
     var globaltoken='<?php echo $_SESSION['globaltoken']; ?>';
 
-    function fetchData() {
+   /* function fetchData() {
         $.ajax({
             url: 'ajaxserver.php?page=sync_meja',
             type: 'POST',
@@ -62,8 +81,10 @@
                 if(respon.status === 'success') {
                     // 2. Cek apakah nilai baru berbeda dengan nilai lama
                     if (respon.nilai !== nilaiLama) {
-                            route('denah_meja', 'box-denah-meja', '0', 'false');
+                            //route('denah_meja', 'box-denah-meja', '0', 'false');
                         // Perbarui nilai lama dengan nilai yang baru
+                        
+
                         nilaiLama = respon.nilai; 
                     }
                 }
@@ -79,5 +100,80 @@
     }
     // Pemicu pertama kali saat halaman siap
     fetchData();
-});    
+    */
+
+    function fetchData() {
+    $.ajax({
+        url: 'ajaxserver.php?page=sync_meja',
+        type: 'POST',
+        data: { ajax: 'ajax', globaltoken: globaltoken },
+        dataType: 'json',
+        success: function(respon) {
+            if(respon.status === 'success') {
+                // 2. Cek apakah nilai baru berbeda dengan nilai lama
+                if (respon.nilai !== nilaiLama) {
+                    // route('denah_meja', 'box-denah-meja', '0', 'false');
+                    
+                    // ============================================================
+                    // SISIPAN KODE: Proses ambil data JSON "daftarmeja" & update class
+                    // ============================================================
+                    const arrayMeja = respon.daftarmeja;
+
+                    arrayMeja.forEach(meja => {
+                        const nomorMeja = meja.table_number;  // Mengambil "1", "2", dst
+                        const statusMeja = meja.status_meja; // Mengambil "occupied" atau "available"
+
+                        // Cari elemen HTML berdasarkan atribut data-nomor
+                        const elemenHTML = document.querySelector(`.card-meja[data-nomor="${nomorMeja}"]`);
+
+                        // Jika elemen meja ditemukan di HTML, ubah class-nya
+                        if (elemenHTML) {
+                            const indicatorSpan = elemenHTML.querySelector('.status-indicator');
+                            const tombolStatus = elemenHTML.querySelector('.btn-ubah-status');
+                            if (statusMeja === 'occupied') {
+                                elemenHTML.classList.remove('status-kosong');
+                                elemenHTML.classList.add('status-terisi');
+                                if (indicatorSpan) {
+                                    indicatorSpan.classList.remove('status-kosong');
+                                    indicatorSpan.classList.add('status-terisi');
+                                    indicatorSpan.textContent = 'Terisi (Makan)';
+                                }
+                                if (tombolStatus) {
+                                    tombolStatus.textContent = 'Kosongkan Meja';
+                                }
+                            } else if (statusMeja === 'available') {
+                                elemenHTML.classList.remove('status-terisi');
+                                elemenHTML.classList.add('status-kosong');
+                                if (indicatorSpan) {
+                                    indicatorSpan.classList.remove('status-terisi');
+                                    indicatorSpan.classList.add('status-kosong');
+                                    indicatorSpan.textContent = 'Kosong';
+                                }
+                                if (tombolStatus) {
+                                    tombolStatus.textContent = 'Isi Meja';
+                                }
+                            }
+                        }
+                    });
+                    // ============================================================
+
+                    // Perbarui nilai lama dengan nilai yang baru
+                    nilaiLama = respon.nilai; 
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Koneksi gagal atau file tidak ditemukan:", error);
+        },
+        complete: function() {
+            // 3. AKTIFKAN KEMBALI: Lakukan polling setiap 5 detik setelah request selesai
+            setTimeout(fetchData, 3000);
+        }
+    });
+}
+// Pemicu pertama kali saat halaman siap
+fetchData();
+}); 
+
+
 </script>
