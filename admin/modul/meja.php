@@ -19,7 +19,7 @@ foreach($result as $row){
                     <div class="card-meja status-kosong" data-nomor="<?= $id_meja ?>">
                         <div class="meja-actions">
                             <button class="btn-action-meja edit" onclick="route('edit_meja', 'popupcontent', '1', 'true')"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-action-meja delete btn-hapus-meja"><i class="fa-solid fa-trash"></i></button>
+                            <button class="btn-action-meja delete btn-hapus-meja" onclick="confirm('Apakah Anda yakin ingin menghapus meja ini?') ? route('hapus_meja&id=<?= $id_meja ?>', 'popupcontent', '0', 'false') : false;"><i class="fa-solid fa-trash"></i></button>
                         </div>
                         <div class="meja-icon"><i class="fa-solid fa-couch meja-icon-color"></i></div>
                         <div class="meja-name">Meja <?= $nomor_meja ?></div>

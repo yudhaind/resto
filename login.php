@@ -15,7 +15,7 @@
         }
 
         body {
-            background: #f4f6f9;
+            background: #2c1829;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -166,13 +166,6 @@
                 <label for="password">Kata Sandi</label>
                 <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
             </div>
-
-            <div class="form-actions">
-                <label class="remember-me">
-                    <input type="checkbox" name="remember"> Ingat Saya
-                </label>
-                <a href="#" class="forgot-pass">Lupa Sandi?</a>
-            </div>
             <?php 
             $tokenid=bin2hex(random_bytes(32));
 			$_SESSION['token']=$tokenid;
@@ -181,10 +174,6 @@
             <input type="hidden" name="action" value="login">
             <button type="submit" class="btn-login">Masuk</button>
         </form>
-
-        <div class="login-footer">
-            Belum punya akun? <a href="#">Daftar sekarang</a>
-        </div>
     </div>
 
 </body>
