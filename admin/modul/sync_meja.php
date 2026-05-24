@@ -18,6 +18,11 @@ try {
     $daftarmeja=[];
     if ($data_meja) {
         foreach ($data_meja as $row) {
+            if ($row['status'] == 'available') {
+                $status_meja = 'Kosong';
+            } else {
+                $status_meja = 'Terisi';
+            }
             $daftarmeja[] = [
                 'id' => $row['id'],
                 'table_number' => $row['table_number'],
