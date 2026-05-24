@@ -35,3 +35,30 @@ function stream(t, c, q, loader) {
         }
     });
 }
+
+function submitForm(formSelector,resultTarget,preform){
+    $(document).off("submit", '#' + formSelector).on("submit", '#' + formSelector, function(e){
+        e.preventDefault();
+        var form = this;
+        console.log($(form).serialize());
+
+        $.ajax({
+            url: 'post.php',
+            type: "POST",
+            data: $(form).serialize(),
+
+            success:function(res){
+                $('#' + resultTarget).html(res);
+                if (preform=='reset'){
+                    form.reset();	
+                }
+            },
+
+            error:function(){
+               alert("Terjadi kesalahan");
+            }
+        });
+    });
+}
+
+

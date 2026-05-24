@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin Kasir</title>
     <!-- Font Awesome untuk Ikon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/fontawesome-free-7.2.0-web/css/all.min.css">
     <script src="assets/js/jquery-4.0.0.min.js"></script>
     <link rel="stylesheet" href="assets/css/adminstyle.css">
     <script src="assets/js/main.js"></script>
@@ -105,9 +105,16 @@
             $('#toggleBtn, #sidebarOverlay').on('click', function() {
                 $('#sidebar').toggleClass('open');
             });
-
+            
             // 3. LOGIKA INTERAKTIF MANAJEMEN MEJA
             
+            $(document).on('click', '.btn-ubah-status', function() {
+                var card = $(this).closest('.card-meja'); 
+                var id_meja = card.data('nomor');
+                var globaltoken = $('#globaltoken').val(); 
+                route('ubah_status_meja&id_meja=' + id_meja + '&token=' + globaltoken, 'popupcontent', '0', 'false');
+            });
+            /*
             // A. Tambah Meja Baru
             $('#btn-tambah-meja').on('click', function() {
                 var jumlahMejaSaatIni = $('.card-meja').length;
@@ -166,7 +173,7 @@
                 var jumlahTerisi = $('.card-meja.status-terisi').length;
                 $('#stat-pending-meja').text(jumlahTerisi + " Meja");
             }
-
+*/
         });
     </script>
     <script src="assets/js/lightbox.js"></script>

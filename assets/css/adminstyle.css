@@ -106,3 +106,20 @@
             .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 99; }
             .sidebar.open + .sidebar-overlay { display: block; }
         }
+.error-message{
+background:rgba(255,0,0,0.2);
+color:red;
+padding:8px;
+border-radius:8px;
+font-size:16px;
+margin-bottom:15px;
+}
+
+.ok-message{
+background:rgba(255,0,0,0.2);
+padding:8px;
+border-radius:8px;
+font-size:16px;
+margin-bottom:15px;	
+color:green;	
+}
