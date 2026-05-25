@@ -47,7 +47,8 @@
             <script>
     $(document).ready(function() {
     // 1. Inisialisasi nilaiLama di luar fungsi fetchData agar nilainya tetap tersimpan
-     let nilaiLama = null; 
+     let nilaiLamaIsi = null; 
+     let nilaiLamaKsg = null;
     var globaltoken='<?php echo $_SESSION['globaltoken']; ?>';
 
    function fetchData() {
@@ -59,12 +60,13 @@
             success: function(respon) {
                 if(respon.status === 'success') {
                     // 2. Cek apakah nilai baru berbeda dengan nilai lama
-                    if (respon.nilai !== nilaiLama) {
+                    if ((respon.nilai_isi !== nilaiLamaIsi) || (respon.nilai_ksg !== nilaiLamaKsg)) {
                             route('denah_meja', 'box-denah-meja', '0', 'false');
                         // Perbarui nilai lama dengan nilai yang baru
                         
 
-                        nilaiLama = respon.nilai; 
+                        nilaiLamaIsi = respon.nilai_isi;
+                        nilaiLamaKsg = respon.nilai_ksg; 
                     }
                 }
             },
