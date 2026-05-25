@@ -6,27 +6,6 @@
 
                 <!-- Container Denah Layout Meja -->
                 <div class="grid-meja" id="box-denah-meja">
-                    
-                <?php
-$sql="SELECT * FROM `tables`";
-$result=fetchAll($sql);
-foreach($result as $row){
-    $nomor_meja=$row['table_number'];
-    $id_meja=$row['id'];
-    $status_meja=$row['status']; 
-                ?>
-                    <!-- Meja 1 -->
-                    <div class="card-meja status-kosong" data-nomor="<?= $id_meja ?>">
-                        <div class="meja-actions">
-                            <button class="btn-action-meja edit" onclick="route('edit_meja', 'popupcontent', '1', 'true')"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-action-meja delete btn-hapus-meja" onclick="confirm('Apakah Anda yakin ingin menghapus meja ini?') ? route('hapus_meja&id=<?= $id_meja ?>', 'popupcontent', '0', 'false') : false;"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <div class="meja-icon"><i class="fa-solid fa-couch meja-icon-color"></i></div>
-                        <div class="meja-name">Meja <?= $nomor_meja ?></div>
-                        <span class="status-indicator status-kosong">Kosong</span>
-                        <button class="btn btn-outline btn-sm btn-ubah-status">Isi Manual</button>
-                    </div>
-<?php } ?>
                     <!-- Meja 2 
                     <div class="card-meja status-kosong" data-nomor="2">
                         <div class="meja-actions">
@@ -71,7 +50,7 @@ foreach($result as $row){
      let nilaiLama = null; 
     var globaltoken='<?php echo $_SESSION['globaltoken']; ?>';
 
-   /* function fetchData() {
+   function fetchData() {
         $.ajax({
             url: 'ajaxserver.php?page=sync_meja',
             type: 'POST',
@@ -81,7 +60,7 @@ foreach($result as $row){
                 if(respon.status === 'success') {
                     // 2. Cek apakah nilai baru berbeda dengan nilai lama
                     if (respon.nilai !== nilaiLama) {
-                            //route('denah_meja', 'box-denah-meja', '0', 'false');
+                            route('denah_meja', 'box-denah-meja', '0', 'false');
                         // Perbarui nilai lama dengan nilai yang baru
                         
 
@@ -94,15 +73,19 @@ foreach($result as $row){
             },
             complete: function() {
                 // 3. AKTIFKAN KEMBALI: Lakukan polling setiap 1 detik setelah request selesai
-               setTimeout(fetchData, 5000);
+                const halamanMejaMasihAktif = document.getElementById('box-denah-meja');
+                if (halamanMejaMasihAktif) {
+                    setTimeout(fetchData, 5000);
+                } else {
+                    console.log("Halaman Manajemen Meja sudah tidak aktif. Polling dihentikan.");
+                }
             }
         });
     }
     // Pemicu pertama kali saat halaman siap
     fetchData();
-    */
 
-    function fetchData() {
+    /*function fetchData() {
     $.ajax({
         url: 'ajaxserver.php?page=sync_meja',
         type: 'POST',
@@ -112,7 +95,7 @@ foreach($result as $row){
             if(respon.status === 'success') {
                 // 2. Cek apakah nilai baru berbeda dengan nilai lama
                 if (respon.nilai !== nilaiLama) {
-                    // route('denah_meja', 'box-denah-meja', '0', 'false');
+                    route('denah_meja', 'box-denah-meja', '0', 'false');
                     
                     // ============================================================
                     // SISIPAN KODE: Proses ambil data JSON "daftarmeja" & update class
@@ -173,6 +156,7 @@ foreach($result as $row){
 }
 // Pemicu pertama kali saat halaman siap
 fetchData();
+*/
 }); 
 
 
