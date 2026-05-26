@@ -6,6 +6,7 @@
 
                 <!-- Container Denah Layout Meja -->
                 <div class="grid-meja" id="box-denah-meja">
+                <input type="hidden" id="target-sync" value="meja" disabled>
                     <!-- Meja 2 
                     <div class="card-meja status-kosong" data-nomor="2">
                         <div class="meja-actions">
@@ -49,13 +50,14 @@
     // 1. Inisialisasi nilaiLama di luar fungsi fetchData agar nilainya tetap tersimpan
      let nilaiLamaIsi = null; 
      let nilaiLamaKsg = null;
-    var globaltoken='<?php echo $_SESSION['globaltoken']; ?>';
+     var globaltoken='<?php echo $_SESSION['globaltoken']; ?>';
+     var targetSync = $('#target-sync').val();
 
    function fetchData() {
         $.ajax({
-            url: 'ajaxserver.php?page=sync_meja',
+            url: 'ajaxserver.php?page=sync',
             type: 'POST',
-            data: { ajax: 'ajax',globaltoken:globaltoken},
+            data: { ajax: 'ajax',globaltoken:globaltoken, target: targetSync },
             dataType: 'json',
             success: function(respon) {
                 if(respon.status === 'success') {

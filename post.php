@@ -47,5 +47,23 @@ if ($tokenform !== $_SESSION['token']) {
               echo '<div class="ok-message">Meja berhasil ditambahkan</div>'; 
             }
          }
+    } else if ($action === 'update_meja') {
+        $id = $_POST['id'] ?? '';
+        $nomor_meja = $_POST['nomor_meja'] ?? '';
+        $kapasitas_meja = $_POST['kapasitas_meja'] ?? '';
+
+        if (empty($nomor_meja) || empty($kapasitas_meja)) {
+            echo '<div class="error-message">Nomor meja dan kapasitas wajib diisi</div>';  
+         } else {
+            $sql_cek = "SELECT * FROM `tables` WHERE table_number = ? AND id != ?";
+            $rsl_cek = numRows($sql_cek, [$nomor_meja, $id]);
+            if ($rsl_cek > 0) {
+                echo '<div class="error-message">Nomor meja sudah ada</div>';
+            } else {
+              $sql = "UPDATE `tables` SET table_number = ?, capacity = ? WHERE id = ?";
+              query($sql, [$nomor_meja, $kapasitas_meja, $id]);
+              echo '<div class="ok-message">Meja berhasil diperbarui</div>'; 
+            }
+         }
     }
 }

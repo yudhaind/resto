@@ -4,6 +4,9 @@ header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate'); // Pastikan browser tidak menyimpan cache
 
 require_once 'database.php';
+$target = isset($_POST['target']) ? $_POST['target'] : '';
+
+if ($target === 'meja') {
 
 try {
     // KOREKSI 1: Menambahkan titik koma (;) yang hilang di akhir string query
@@ -21,14 +24,15 @@ try {
         echo json_encode([
             'status' => 'success',
             'nilai_ksg'  => (int)$data_ksg['nilai_ksg'], // Di-cast ke integer agar tipe datanya berupa angka bersih
-            'nilai_isi'  => (int)$data_isi['nilai_isi'] // Di-cast ke integer agar tipe datanya berupa angka bersih
+            'nilai_isi'  => (int)$data_isi['nilai_isi'],
+            // Di-cast ke integer agar tipe datanya berupa angka bersih
         ]);
     } else {
         // Antisipasi jika fungsi fetchOne mengembalikan false karena kendala teknis
         echo json_encode([
             'status' => 'success',
             'nilai_ksg'  => 0,
-            'nilai_isi'  => 0
+            'nilai_isi'  => 0,
         ]);
     }
     
@@ -41,5 +45,6 @@ try {
         'pesan'  => 'Gagal mengeksekusi data.'
     ]);
 }
-    
+
+}
 ?>

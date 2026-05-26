@@ -52,6 +52,9 @@ function submitForm(formSelector,resultTarget,preform){
                 if (preform=='reset'){
                     form.reset();	
                 }
+                setTimeout(function () {
+                    closeLightbox(); // bisa juga .hide()
+                }, 3000); // 3000 ms = 3 detik
             },
 
             error:function(){

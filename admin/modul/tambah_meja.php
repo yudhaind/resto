@@ -13,7 +13,7 @@ $_SESSION['token']=$tokenid;
         </div>
         <div class="form-group">
             <label for="kapasitas_meja">Kapasitas Meja</label>
-            <input type="number" id="kapasitas_meja" name="kapasitas_meja" placeholder="Masukkan kapasitas meja" required>
+            <input type="number" id="kapasitas_meja" name="kapasitas_meja" placeholder="Masukkan kapasitas meja" value="2" required>
         </div>
         <button type="submit" class="btn btn-modern">Tambah Meja</button>
     </form>
