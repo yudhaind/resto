@@ -50,6 +50,7 @@
     // 1. Inisialisasi nilaiLama di luar fungsi fetchData agar nilainya tetap tersimpan
      let nilaiLamaIsi = null; 
      let nilaiLamaKsg = null;
+     let nilaiWaktu = null;
      var globaltoken='<?php echo $_SESSION['globaltoken']; ?>';
      var targetSync = $('#target-sync').val();
 
@@ -62,13 +63,14 @@
             success: function(respon) {
                 if(respon.status === 'success') {
                     // 2. Cek apakah nilai baru berbeda dengan nilai lama
-                    if ((respon.nilai_isi !== nilaiLamaIsi) || (respon.nilai_ksg !== nilaiLamaKsg)) {
+                    if ((respon.nilai_isi !== nilaiLamaIsi) || (respon.nilai_ksg !== nilaiLamaKsg) || (respon.total_waktu !== nilaiWaktu)) {
                             route('denah_meja', 'box-denah-meja', '0', 'false');
                         // Perbarui nilai lama dengan nilai yang baru
                         
 
                         nilaiLamaIsi = respon.nilai_isi;
                         nilaiLamaKsg = respon.nilai_ksg; 
+                        nilaiWaktu = respon.total_waktu;
                     }
                 }
             },

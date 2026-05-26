@@ -13,9 +13,11 @@ try {
     // KOREKSI 2: Mengubah nama variabel dari $aql menjadi $sql agar lebih standar
     $sql_ksg = "SELECT COUNT(*) as nilai_ksg FROM `tables` WHERE tables.status = 'available'";
     $sql_isi = "SELECT COUNT(*) as nilai_isi FROM `tables` WHERE tables.status = 'occupied'";
+    $sql_wkt = "SELECT sum(updated_at) AS total_waktu FROM `tables`";
     
     $data_ksg = fetchOne($sql_ksg);
     $data_isi = fetchOne($sql_isi);
+    $data_wkt = fetchOne($sql_wkt);
    
 
     // KOREKSI 3: Fungsi COUNT(*) di SQL SELALU mengembalikan nilai (minimal angka 0)
@@ -25,6 +27,7 @@ try {
             'status' => 'success',
             'nilai_ksg'  => (int)$data_ksg['nilai_ksg'], // Di-cast ke integer agar tipe datanya berupa angka bersih
             'nilai_isi'  => (int)$data_isi['nilai_isi'],
+            'total_waktu' => (int)$data_wkt['total_waktu'],
             // Di-cast ke integer agar tipe datanya berupa angka bersih
         ]);
     } else {
@@ -33,6 +36,7 @@ try {
             'status' => 'success',
             'nilai_ksg'  => 0,
             'nilai_isi'  => 0,
+            'total_waktu' => 0,
         ]);
     }
     
