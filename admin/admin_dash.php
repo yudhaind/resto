@@ -16,9 +16,8 @@
     </style>
 </head>
 <body>
-</body>
-<input type="hidden" id="globaltoken" value="<?= $_SESSION['globaltoken']; ?>">
-<!-- LIGHTBOX UNTUK POPUP -->
+    <input type="hidden" id="globaltoken" value="<?= $_SESSION['globaltoken']; ?>">
+    <!-- LIGHTBOX UNTUK POPUP -->
 <div class="lightbox" id="lightbox">
     <div class="lightbox-content">
         <span class="close-btn" onclick="closeLightbox()">&times;</span>
@@ -36,6 +35,7 @@
             <li><a href="#" data-target="users"><i class="fa-solid fa-users"></i> Kelola User</a></li>
             <li><a href="#" data-target="menuharga"><i class="fa-solid fa-utensils"></i> Menu & Harga</a></li>
             <li><a href="#" data-target="laporan"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan</a></li>
+            <li><a href="#" data-target="setting"><i class="fa-solid fa-gear"></i> Setting</a></li>
             <li><a href="#" data-target="logout"><i class="fa-solid fa-user"></i> Logout</a></li>
         </ul>
     </div>
