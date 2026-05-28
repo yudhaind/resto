@@ -172,6 +172,7 @@
             ?>
             <input type="hidden" name="tokenform" value="<?= $tokenid; ?>">
             <input type="hidden" name="action" value="login">
+            <div><?php echo $_SESSION['error'] ?? ''; ?></div>
             <button type="submit" class="btn-login">Masuk</button>
         </form>
     </div>

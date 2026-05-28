@@ -51,14 +51,14 @@
      let nilaiLamaIsi = null; 
      let nilaiLamaKsg = null;
      let nilaiWaktu = null;
-     var globaltoken='<?php echo $_SESSION['globaltoken']; ?>';
+     var globaltoken= '<?php echo $_SESSION['globaltoken']; ?>';
      var targetSync = $('#target-sync').val();
 
    function fetchData() {
         $.ajax({
             url: 'ajaxserver.php?page=sync',
             type: 'POST',
-            data: { ajax: 'ajax',globaltoken:globaltoken, target: targetSync },
+            data: { ajax: 'ajax', globaltoken: globaltoken, target: targetSync },
             dataType: 'json',
             success: function(respon) {
                 if(respon.status === 'success') {

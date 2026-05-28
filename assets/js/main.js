@@ -36,8 +36,8 @@ function stream(t, c, q, loader) {
     });
 }
 
-function submitForm(formSelector,resultTarget,preform){
-    $(document).off("submit", '#' + formSelector).on("submit", '#' + formSelector, function(e){
+function submitForm(formSelector, resultTarget, preform, callback) {
+    $(document).off("submit", '#' + formSelector).on("submit", '#' + formSelector, function(e) {
         e.preventDefault();
         var form = this;
         console.log($(form).serialize());
@@ -47,21 +47,44 @@ function submitForm(formSelector,resultTarget,preform){
             type: "POST",
             data: $(form).serialize(),
 
-            success:function(res){
+            success: function(res) {
+                // 1. Masukkan hasil respons ke dalam target elemen
                 $('#' + resultTarget).html(res);
-                if (preform=='reset'){
-                    form.reset();	
+                
+                if (typeof callback === 'function') {
+                    callback();
                 }
-                setTimeout(function () {
-                    closeLightbox(); // bisa juga .hide()
-                }, 3000); // 3000 ms = 3 detik
+                // 2. Cek apakah di dalam respons (atau di dalam resultTarget) ada class .ok-message
+                // Kita gunakan $(res).find('.ok-message').length atau periksa langsung ke elemen target
+                if ($('#' + resultTarget).find('.ok-message').length > 0 || $(res).hasClass('ok-message')) {
+                    
+                    // Jika ada class .ok-message, jalankan hitung mundur closeLightbox
+                    setTimeout(function () {
+                        closeLightbox(); 
+                    }, 2000); // 2000 ms = 2 detik
+                    
+                }
+
+                // 3. Jalankan reset form jika parameter preform adalah 'reset'
+                if (preform == 'reset') {
+                    form.reset();   
+                }
             },
 
-            error:function(){
+            error: function(xhr, status, error) { // Menambahkan parameter xhr agar tidak error saat di-log
                alert("Terjadi kesalahan");
+               console.log(xhr.responseText);
             }
         });
     });
 }
 
-
+function del(parameter,name,id,target,result,act){
+    route('del&id='+id+'&parameter='+parameter,'popupcontent','0','false');
+    if (act=='restore'){
+        alert('Data '+name+' Berhasil di restore');
+    } else  {
+        alert('Data '+name+' Berhasil Dihapus');
+    }
+    route(target, result, '0', 'false');
+}

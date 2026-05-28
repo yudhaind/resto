@@ -79,6 +79,7 @@
         .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
         .btn-danger { background: var(--danger); color: #fff; }
         .btn-warning { background: var(--warning); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--dark); }
         .btn-outline:hover { background: var(--light); }
 

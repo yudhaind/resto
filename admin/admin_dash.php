@@ -22,7 +22,7 @@
 <div class="lightbox" id="lightbox">
     <div class="lightbox-content">
         <span class="close-btn" onclick="closeLightbox()">&times;</span>
-		<div id="popupcontent"> </div>
+		<div id="popupcontent" class="popup-content"> </div>
     </div>
 </div>
     <!-- SIDEBAR -->
@@ -75,7 +75,6 @@
     </div>
 
     <!-- SCRIPT LOGIKAL INTERAKSI -->
-    <script src="assets/js/jquery-4.0.0.min.js"></script>
     <script>
        $(document).ready(function() {
             

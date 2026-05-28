@@ -9,14 +9,20 @@ if ($tokenform !== $_SESSION['token']) {
     if ($action === 'login') {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-
-        if (empty($username) || empty($password)) {
-            $_SESSION['error']="Username dan password wajib diisi";
-            exit;
-			header('location:logout.php');
-        } 
+        
         $sql = "SELECT * FROM users WHERE username = ?";
         $rsl = fetchOne($sql, [$username]);
+        $status=$rsl['is_active'];
+        if (empty($username) || empty($password) || $status === 3) {
+            if ($status===3){
+                $_SESSION['error']="User Tidak Aktif";
+            } else {
+                $_SESSION['error']="Username dan password wajib diisi";
+            }
+            header('location:logout.php');
+            exit;
+        } 
+       
         // Lakukan validasi login di sini, misalnya dengan memeriksa database
         if ($rsl && password_verify($password, $rsl['password'])) {
             // Login berhasil, simpan informasi pengguna di session
@@ -65,5 +71,70 @@ if ($tokenform !== $_SESSION['token']) {
               echo '<div class="ok-message">Meja berhasil diperbarui</div>'; 
             }
          }
+    } else if ($action === 'tambah_user') {
+        $name = $_POST['name'] ?? '';
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $role = $_POST['role'] ?? '';
+        $is_active = $_POST['is_active'] ?? '';
+
+        if (empty($name) || empty($username) || empty($password) || empty($role) || empty($is_active)) {
+            echo '<div class="error-message">Semua field wajib diisi</div>';  
+         } else {
+            $sql_cek = "SELECT * FROM `users` WHERE username = ?";
+            $rsl_cek = numRows($sql_cek, [$username]);
+            if ($rsl_cek > 0) {
+                echo '<div class="error-message">Username sudah ada</div>';
+            } else {
+              $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+              $sql = "INSERT INTO `users` (name, username, password, role, is_active) VALUES (?, ?, ?, ?, ?)";
+              query($sql, [$name, $username, $hashed_password, $role, $is_active]);
+              echo '<div class="ok-message">User berhasil ditambahkan</div>'; 
+            }
+        }
+    } else if ($action === 'edit_user') {
+        $name = $_POST['name'] ?? '';
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $role = $_POST['role'] ?? '';
+        $is_active = $_POST['is_active'] ?? '';
+        $id=$_POST['id'] ?? '';
+
+        if (empty($name) || empty($username) || empty($role) || empty($is_active)) {
+            echo '<div class="error-message">Semua field wajib diisi</div>';  
+
+        } else {
+            $sql="SELECT * FROM users WHERE username = ?";
+            $rsl_cek=fetchOne($sql,[$username]);
+            $count_cek=numRows($sql,[$username]);
+            $iddb = $rsl_cek ? $rsl_cek['id'] : null;
+            //echo $count_cek." data ditemukan, id sendiri :".$id.", id database : ".$iddb;
+            if ($count_cek > 0) {
+                if ($id == $iddb){
+                    if (empty($password)) {
+                        $sql_update="UPDATE `users` SET `username` = ?, `name` = ?, `role` = ?, `is_active` = ? WHERE `users`.`id` = ?";
+                        query($sql_update,[$username, $name, $role, $is_active, $id]);
+                    } else {
+                        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                        $sql_update="UPDATE `users` SET `username` = ?, `password` = ? , `name` = ?, `role` = ?, `is_active` = ? WHERE `users`.`id` = ?";
+                        query($sql_update,[$username, $hashed_password, $name, $role, $is_active, $id]);
+                    }
+                    echo '<div class="ok-message">Data berhasil di update</div>';
+                } else {
+                    echo '<div class="error-message">Username Telah di gunakan Oranglain</div>'; 
+                }
+            } else {
+                if (empty($password)) {
+                        $sql_update="UPDATE `users` SET `username` = ?, `name` = ?, `role` = ?, `is_active` = ? WHERE `users`.`id` = ?";
+                        query($sql_update,[$username, $name, $role, $is_active, $id]);
+                    } else {
+                        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                        $sql_update="UPDATE `users` SET `username` = ?, `password` = ? , `name` = ?, `role` = ?, `is_active` = ? WHERE `users`.`id` = ?";
+                        query($sql_update,[$username, $hashed_password, $name, $role, $is_active, $id]);
+                    }
+                    echo '<div class="ok-message">Data berhasil di update</div>';    
+            }
+            
+        }
     }
 }
