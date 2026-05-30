@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin Kasir</title>
     <!-- Font Awesome untuk Ikon -->
-    <link rel="stylesheet" href="assets/fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="assets/fontawesome-web/css/all.min.css">
     <script src="assets/js/jquery-4.0.0.min.js"></script>
     <link rel="stylesheet" href="assets/css/adminstyle.css">
     <script src="assets/js/main.js"></script>
@@ -20,7 +20,7 @@
     <!-- LIGHTBOX UNTUK POPUP -->
 <div class="lightbox" id="lightbox">
     <div class="lightbox-content">
-        <span class="close-btn" onclick="closeLightbox()">&times;</span>
+        <button class="btn btn-danger btn-sm close-btn" onclick="closeLightbox()"><i class="fa-solid fa-xmark"></i></button>
 		<div id="popupcontent" class="popup-content"> </div>
     </div>
 </div>
