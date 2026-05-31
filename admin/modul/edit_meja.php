@@ -23,7 +23,7 @@ $data_meja = fetchOne($sql, [$id_meja]);
             <input type="number" id="kapasitas_meja" name="kapasitas_meja" placeholder="Masukkan kapasitas meja" value="<?= $data_meja['capacity'] ?? '2'; ?>" required>
         </div>
 
-        <button type="submit" class="btn btn-modern">Edit Meja</button>
+        <button type="submit" class="btn btn-modern">Simpan</button>
     </form>
 
     <div id="result" style="margin-top: 15px;"></div>
