@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kasir Modern - Compact Tables</title>
+    <title>Sistem Kasir Modern</title>
     <style>
         :root {
             --bg-body: #f8fafc;
@@ -39,34 +39,16 @@
         h2 { font-size: 14px; font-weight: 700; margin-bottom: 18px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         
         /* Form Styling */
-        .form-row { display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px; }
+        .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
         .form-group { flex: 1; }
         label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
         
-        input[type="text"], input[type="number"] { 
+        select, input[type="text"], input[type="number"] { 
             width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; color: var(--text-main); outline: none; transition: border 0.15s;
         }
-        input:focus { border-color: var(--primary); }
-
-        /* GRID MEJA ULTRA COMPACT */
-        .meja-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; margin-bottom: 14px; }
-        .meja-box {
-            padding: 8px 4px; border: 1px solid var(--border); border-radius: 6px; text-align: center; cursor: pointer; transition: all 0.2s;
-            display: flex; flex-direction: column; gap: 2px; background: #fff;
-        }
-        .meja-box .m-number { font-weight: 700; font-size: 13px; }
-        .meja-box .m-status { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2px; }
-
-        /* State Status Meja */
-        .meja-box.kosong { border-color: #a7f3d0; color: #065f46; background: #f0fdf4; }
-        .meja-box.kosong:hover { border-color: var(--success); background: #e6fced; }
+        select:focus, input:focus { border-color: var(--primary); }
         
-        .meja-box.terisi { border-color: #fca5a5; color: #991b1b; background: #fef2f2; cursor: not-allowed; opacity: 0.65; }
-        
-        /* State Meja Terpilih */
-        .meja-box.kosong.selected { border-color: var(--primary); background: #eff6ff; color: var(--primary); box-shadow: 0 0 0 2px #bfdbfe; }
-        
-        /* Opsi Pembayaran */
+        /* Opsi Pembayaran Semakin Elegan */
         .option-container { display: flex; gap: 12px; }
         .radio-label { 
             flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 600;
@@ -75,7 +57,7 @@
         .radio-label input { display: none; }
         .radio-label:has(input:checked) { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
 
-        /* Grid Produk */
+        /* Grid Produk yang Lebih Bersih */
         .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
         .product-button { 
             background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: left; 
@@ -122,13 +104,6 @@
         .btn-submit.btn-sekarang:hover { background: var(--success-hover); }
         .btn-submit:disabled { background: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed; }
         .empty-text { color: var(--text-muted); text-align: center; padding: 30px 10px; font-style: italic; font-size: 13px; }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
-        }
-        .shake-warning { animation: shake 0.4s ease-in-out; border-color: var(--danger) !important; box-shadow: 0 0 8px rgba(239, 68, 68, 0.2); }
     </style>
 </head>
 <body>
@@ -136,31 +111,18 @@
 <div class="container">
     
     <div class="menu-section">
-        <div class="card" id="section-pelanggan">
-            <h2>1. Detail Pelanggan & Pilih Meja</h2>
+        <div class="card">
+            <h2>1. Detail Pelanggan</h2>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Pilih Meja Yang Tersedia</label>
-                    <div class="meja-grid">
-                        <div class="meja-box kosong" data-meja-id="1">
-                            <span class="m-number">M-01</span>
-                            <span class="m-status">Ready</span>
-                        </div>
-                        <div class="meja-box terisi" data-meja-id="2">
-                            <span class="m-number">M-02</span>
-                            <span class="m-status">Full</span>
-                        </div>
-                        <div class="meja-box kosong" data-meja-id="3">
-                            <span class="m-number">M-03</span>
-                            <span class="m-status">Ready</span>
-                        </div>
-                        <div class="meja-box kosong" data-meja-id="4">
-                            <span class="m-number">M-04</span>
-                            <span class="m-status">Ready</span>
-                        </div>
-                    </div>
+                    <label>Nomor Meja</label>
+                    <select id="select-meja">
+                        <option value="1">Meja 01</option>
+                        <option value="2">Meja 02</option>
+                        <option value="3">Meja 03</option>
+                        <option value="4">Meja 04</option>
+                    </select>
                 </div>
-
                 <div class="form-group">
                     <label>Nama Pelanggan</label>
                     <input type="text" id="input-nama" placeholder="Nama (opsional)">
@@ -180,7 +142,7 @@
             </div>
         </div>
 
-        <div class="card" id="section-pilih-menu">
+        <div class="card">
             <h2>2. Pilihan Menu</h2>
             <div class="menu-grid">
                 <div class="product-button" data-id="10" data-nama="Nasi Goreng" data-harga="25000">
@@ -208,7 +170,7 @@
             <h2>3. Ringkasan Pesanan</h2>
             
             <form id="form-kasir">
-                <input type="hidden" name="table_id" id="hidden-table-id" value="">
+                <input type="hidden" name="table_id" id="hidden-table-id" value="1">
                 <input type="hidden" name="cashier_id" value="1">
                 <input type="hidden" name="customer_name" id="hidden-customer-name" value="">
                 <input type="hidden" name="payment_type" id="hidden-payment-type" value="nanti">
@@ -259,10 +221,8 @@ $(document).ready(function() {
             keranjang.push({ id: id, nama: nama, harga: harga, qty: qty });
         });
 
-        var mejaTerpilih = $('.meja-box.kosong.selected').data('meja-id') || "";
-
         var dataKasir = {
-            meja: mejaTerpilih,
+            meja: $('#select-meja').val(),
             namaPelanggan: $('#input-nama').val(),
             opsiBayar: $('input[name="payment_type"]:checked').val(),
             uangTunai: $('#input-cash').val(),
@@ -276,12 +236,7 @@ $(document).ready(function() {
         if (!dataLokal) return;
 
         var data = JSON.parse(dataLokal);
-        
-        if (data.meja) {
-            $(`.meja-box[data-meja-id="${data.meja}"]`).addClass('selected');
-            $('#hidden-table-id').val(data.meja);
-        }
-
+        $('#select-meja').val(data.meja).trigger('change');
         $('#input-nama').val(data.namaPelanggan).trigger('input');
         $('#input-cash').val(data.uangTunai);
         $(`input[name="payment_type"][value="${data.opsiBayar}"]`).prop('checked', true).trigger('change');
@@ -312,26 +267,13 @@ $(document).ready(function() {
     }
 
     // -------------------------------------------------------------
-    // EVENT HANDLER KONTROL VISUAL MEJA
+    // EVENT HANDLER
     // -------------------------------------------------------------
-    $('.meja-box.kosong').on('click', function() {
-        $('.meja-box').removeClass('selected');
-        $(this).addClass('selected');
-        $('#section-pelanggan').removeClass('shake-warning');
-
-        var idMeja = $(this).data('meja-id');
-        $('#hidden-table-id').val(idMeja);
-        
+    $('#select-meja').on('change', function() { 
+        $('#hidden-table-id').val($(this).val()); 
         simpanKeLocalStorage();
     });
-
-    $('.meja-box.terisi').on('click', function() {
-        alert('Maaf, meja ini sedang digunakan pelanggan lain!');
-    });
-
-    // -------------------------------------------------------------
-    // EVENT HANDLER UMUM
-    // -------------------------------------------------------------
+    
     $('#input-nama').on('input', function() { 
         $('#hidden-customer-name').val($(this).val()); 
         simpanKeLocalStorage();
@@ -353,13 +295,6 @@ $(document).ready(function() {
     });
 
     $('.product-button').on('click', function() {
-        var idMejaTerpilih = $('#hidden-table-id').val();
-        if(!idMejaTerpilih) {
-            $('#section-pelanggan').addClass('shake-warning');
-            $('html, body').animate({ scrollTop: $('#section-pelanggan').offset().top - 20 }, 300);
-            return;
-        }
-
         var id = $(this).data('id');
         var nama = $(this).data('nama');
         var harga = parseInt($(this).data('harga'));
@@ -491,10 +426,8 @@ $(document).ready(function() {
                 if(res.trim() === "SUKSES") {
                     alert('Transaksi Berhasil Diproses!');
                     localStorage.removeItem('kasir_terpadu_data');
-                    
                     $('#form-kasir')[0].reset();
-                    $('.meja-box').removeClass('selected');
-                    $('#hidden-table-id').val('');
+                    $('#select-meja').val('1').trigger('change');
                     $('#input-nama').val('').trigger('input');
                     $('input[name="payment_type"][value="nanti"]').prop('checked', true).trigger('change');
                     $('#box-item-belanja').html('<p class="empty-text">Keranjang masih kosong</p>');

@@ -29,7 +29,8 @@ if ($tokenform !== $_SESSION['token']) {
             $_SESSION['user'] = [
                 'id' => $rsl['id'],
                 'username' => $rsl['username'],
-                'role' => $rsl['role']
+                'role' => $rsl['role'],
+                'name' => $rsl['name']
             ];
             header('location:./');
         } else {

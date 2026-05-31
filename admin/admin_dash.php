@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+<?php 
+$sql="SELECT * FROM `global_settings`";
+$hasil=fetchOne($sql);
+?><!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin Kasir</title>
+    <title>Dashboard Admin</title>
     <!-- Font Awesome untuk Ikon -->
     <link rel="stylesheet" href="assets/fontawesome-web/css/all.min.css">
     <script src="assets/js/jquery-4.0.0.min.js"></script>
@@ -27,7 +30,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <i class="fa-solid fa-shop"></i> Admin Kopi-Yuk
+            <i class="fa-solid fa-shop"></i><?= $hasil['value']; ?>
         </div>
         <ul class="sidebar-menu">
             <li class="active"><a href="#" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> Ringkasan</a></li>
@@ -49,7 +52,7 @@
             <button class="toggle-btn" id="toggleBtn"><i class="fa-solid fa-bars"></i></button>
             <div class="user-profile">
                 <i class="fa-solid fa-circle-user"></i>
-                <span>Halo, Admin Utama</span>
+                <span>Halo, <?= $_SESSION['user']['name']; ?> </span>
             </div>
         </div>
 
@@ -67,10 +70,6 @@
            <?php //include 'modul/menuharga.php'; ?>
              <!-- 5. SECTION: LAPORAN -->
            <?php //include 'modul/laporan.php'; ?>
-
-           
-           
-
         </div>
     </div>
 
