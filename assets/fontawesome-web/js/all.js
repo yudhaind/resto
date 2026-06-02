@@ -653,7 +653,7 @@
   var NAMESPACE_IDENTIFIER = '___FONT_AWESOME___';
   var PRODUCTION = function () {
     try {
-      return "production" === 'production';
+      return undefined === 'production';
     } catch (e$$1) {
       return false;
     }
@@ -1956,7 +1956,7 @@
   var NAMESPACE_IDENTIFIER = '___FONT_AWESOME___';
   var PRODUCTION = function () {
     try {
-      return "production" === 'production';
+      return undefined === 'production';
     } catch (e$$1) {
       return false;
     }
@@ -2878,7 +2878,7 @@
   var NAMESPACE_IDENTIFIER = '___FONT_AWESOME___';
   var PRODUCTION = function () {
     try {
-      return "production" === 'production';
+      return undefined === 'production';
     } catch (e$$1) {
       return false;
     }
@@ -5503,7 +5503,7 @@
   var PSEUDO_ELEMENTS = ['::before', '::after', ':before', ':after'];
   var PRODUCTION = function () {
     try {
-      return "production" === 'production';
+      return undefined === 'production';
     } catch (e$$1) {
       return false;
     }

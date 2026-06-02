@@ -155,6 +155,7 @@ if ($tokenform !== $_SESSION['token']) {
         $cat=$_POST['cat'];
         $namamenu=$_POST['namamenu'];
         $price=$_POST['price'];
+        $price=str_replace(".","",$price);
         $status=$_POST['status'];
 
         $sql="UPDATE `products` SET `name` = ?, `category` = ?, `price` = ?, `is_available` = ? WHERE `products`.`id` = ?";

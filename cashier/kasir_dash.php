@@ -1,3 +1,16 @@
+<?php
+// Diasumsikan session_start() sudah dipanggil di file sebelum ini jika menggunakan $_SESSION
+$sql = "SELECT COLUMN_TYPE
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = 'db_resto'
+        AND TABLE_NAME = 'products'
+        AND COLUMN_NAME = 'category'";
+$h_enum = fetchOne($sql);
+$enum_mentah = $h_enum['COLUMN_TYPE'];
+$cleaned = substr($enum_mentah, 5, -1);
+$cleaned = str_replace("'", "", $cleaned);
+$enum_array = explode(",", $cleaned);
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -5,12 +18,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Kasir Modern - Flexible Payment & Compact</title>
     <link rel="stylesheet" href="assets/css/kasirstyle.css">
-    
 </head>
 <body>
 
+<header class="topbar">
+    <div class="topbar-store-info">
+        <span class="topbar-brand">Nama Toko Anda</span>
+        <span class="topbar-address">Jl. Raya Pusat No. 123, Kota Anda</span>
+    </div>
+    <div class="topbar-user-zone">
+        <div class="topbar-user-info">
+            <span>Kasir: <strong><?= isset($_SESSION['user']['name']) ? htmlspecialchars($_SESSION['user']['name']) : 'Kasir'; ?></strong></span>
+            <span class="topbar-user-role">ID Kasir: #1</span>
+        </div>
+        <a href="logout.php" class="btn-logout" onclick="return confirm('Apakah Anda yakin ingin keluar?')">Logout</a>
+    </div>
+</header>
+
 <div class="container">
     <input type="hidden" id="target-sync" value="meja-di-kasir" disabled>
+    
     <div class="menu-section">
         <div class="card" id="section-pelanggan">
             <h2>1. Detail Pelanggan & Meja</h2>
@@ -20,8 +47,8 @@
                     <button type="button" class="btn-pilih-meja" id="trigger-modal-meja">
                         <span id="text-meja-terpilih">Klik Pilih Meja...</span>
                         <div class="meja-status-counter">
-                            <span class="badge-count ready" title="Ready">4</span>
-                            <span class="badge-count full" title="Full">1</span>
+                            <span class="badge-count ready" title="Ready">0</span>
+                            <span class="badge-count full" title="Full">0</span>
                         </div>
                     </button>
                 </div>
@@ -34,23 +61,38 @@
 
         <div class="card" id="section-pilih-menu">
             <h2>2. Pilihan Menu</h2>
-            <div class="menu-grid">
-                <div class="product-button" data-id="10" data-nama="Nasi Goreng" data-harga="25000">
-                    <div class="p-name">Nasi Goreng</div>
-                    <div class="p-price">Rp 25.000</div>
-                </div>
-                <div class="product-button" data-id="11" data-nama="Mie Goreng" data-harga="22000">
-                    <div class="p-name">Mie Goreng</div>
-                    <div class="p-price">Rp 22.000</div>
-                </div>
-                <div class="product-button" data-id="14" data-nama="Es Teh Manis" data-harga="5000">
-                    <div class="p-name">Es Teh Manis</div>
-                    <div class="p-price">Rp 5.000</div>
-                </div>
-                <div class="product-button" data-id="15" data-nama="Jeruk Peras" data-harga="7000">
-                    <div class="p-name">Jeruk Peras</div>
-                    <div class="p-price">Rp 7.000</div>
-                </div>
+            
+            <div class="category-filter-wrapper">
+                <button type="button" class="btn-category active" data-target="all">Semua</button>
+                <?php
+                foreach ($enum_array as $kategori) {
+                    echo '<button type="button" class="btn-category" data-target="' . htmlspecialchars($kategori) . '">' . ucfirst(htmlspecialchars($kategori)) . '</button>';
+                }
+                ?>
+            </div>
+        
+            <div class="menu-grid" style="max-height: 65vh; overflow-y: auto; padding-right: 5px; align-content: start; padding-top: 5px;">
+                <?php
+                $sql_menu = "SELECT * FROM `products`";
+                $rslt_menu = fetchAll($sql_menu);
+                foreach ($rslt_menu as $menu) {
+                    $id_menu = $menu['id'];
+                    $nama_menu = htmlspecialchars($menu['name'], ENT_QUOTES);
+                    $harga_menu = $menu['price'];
+                    $kategori_menu = htmlspecialchars($menu['category'], ENT_QUOTES);
+                    $gambar_menu = (!empty($menu['image'])) ? 'assets/images/' . $menu['image'] : 'assets/images/'.$kategori_menu.'.png';
+                    
+                    echo '<div class="product-button" data-id="'.$id_menu.'" data-nama="'.$nama_menu.'" data-harga="'.$harga_menu.'" data-kategori="'.$kategori_menu.'">
+                        <div class="p-image-container">
+                            <img src="'.$gambar_menu.'" alt="'.$nama_menu.'" onerror="this.onerror=null; this.src=\'https://placehold.co/100x100?text=Food\';\">
+                        </div>
+                        <div class="p-details">
+                            <div class="p-name">'.$nama_menu.'</div>
+                            <div class="p-price">Rp '.number_format($harga_menu, 0, ',', '.').'</div>
+                        </div>
+                    </div>';
+                }
+                ?>
             </div>
         </div>
     </div>
@@ -59,7 +101,7 @@
         <div class="card">
             <h2>3. Ringkasan Pesanan</h2>
             <form id="form-kasir">
-                <div id="badge-order-type" class="badge-addon">PESANAN TAMBAHAN (ADD-ON)</div>
+                <div id="badge-order-type" class="badge-addon" style="display: none;">PESANAN TAMBAHAN (ADD-ON)</div>
 
                 <input type="hidden" name="table_id" id="hidden-table-id" value="">
                 <input type="hidden" name="cashier_id" value="1">
@@ -73,8 +115,7 @@
 
                 <div class="form-group" style="margin-top: 14px;">
                     <label>Metode Pembayaran</label>
-                    <div class="option-container" id="payment-options-wrapper">
-                        </div>
+                    <div class="option-container" id="payment-options-wrapper"></div>
                 </div>
 
                 <div class="calc-box">
@@ -99,35 +140,18 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="modal-meja-overlay">
+<div class="modal-overlay" id="modal-meja-overlay" style="display: none;">
     <div class="modal-window">
         <div class="modal-header">
             <span class="modal-title">Pilih Nomor Meja</span>
             <button type="button" class="modal-close" id="close-modal-meja">&times;</button>
         </div>
-        <div class="meja-grid-modal">
-            <?php 
-            $sqlmeja="SELECT * FROM `tables`";
-            $hasilmeja=fetchAll($sqlmeja);
-            foreach($hasilmeja as $itemmeja) {
-                $idmeja=$itemmeja['id'];
-                $status=$itemmeja['status'];
-                $nomeja=$itemmeja['table_number'];
-                $kapasitas=$itemmeja['capacity'];
-                    if ($status=='available'){
-                        $data='ready';
-                    } else {
-                        $data='full';
-                    }
-            ?>
-            <div class="meja-box kosong" data-meja-id="<?= $idmeja; ?>" data-status="<?= $data; ?>"><span class="m-number"><?= $nomeja; ?></span><span class="m-status">Kapasitas : <?= $kapasitas; ?></span><span class="m-status"><?= $data; ?></span></div>
-            <?php } ?>
-            <!--
-            <div class="meja-box terisi" data-meja-id="2" data-status="full"><span class="m-number">M-02</span><span class="m-status">Full</span></div>
-            <div class="meja-box kosong" data-meja-id="3" data-status="ready"><span class="m-number">M-03</span><span class="m-status">Ready</span></div>
-            <div class="meja-box kosong" data-meja-id="4" data-status="ready"><span class="m-number">M-04</span><span class="m-status">Ready</span></div>
-            <div class="meja-box kosong" data-meja-id="5" data-status="ready"><span class="m-number">M-05</span><span class="m-status">Ready</span></div>
--->
+        <div class="meja-grid-modal" id="kontainer-meja-live">
+            <div class="meja-box kosong" data-meja-id="1" data-status="ready">
+                <span class="m-number">Meja 1</span>
+                <span class="m-status">Kapasitas : 2</span>
+                <span class="m-status">Ready</span>
+            </div>
         </div>
     </div>
 </div>
@@ -136,22 +160,15 @@
 <script>
 $(document).ready(function() {
 
-    // =========================================================================
-    // [EDIT DI SINI] - ARRAY UNTUK MEMBUAT METODE PEMBAYARAN MENJADI FLEXIBLE
-    // Kasir/Developer cukup menambah atau menghapus baris di bawah ini
-    // =========================================================================
     var listMetodeBayar = [
         { id: "tunai",    label: "Tunai",   defaultChecked: true },
         { id: "qris",     label: "QRIS" },
-        { id: "transfer", label: "Transfer" },
-        // Contoh cara menambah metode baru, hilangkan tanda // di bawah ini untuk mencobanya:
-        // { id: "shopeepay", label: "ShopeePay" }
+        { id: "transfer", label: "Transfer" }
     ];
 
-    // Fungsi Otomatis Render Tombol Metode Pembayaran ke halaman HTML Ringkas
     function renderMetodePembayaran() {
         var wrapper = $('#payment-options-wrapper');
-        wrapper.empty(); // bersihkan area lama
+        wrapper.empty(); 
 
         listMetodeBayar.forEach(function(item) {
             var checkedAttr = item.defaultChecked ? 'checked' : '';
@@ -162,12 +179,27 @@ $(document).ready(function() {
             `;
             wrapper.append(htmlButton);
         });
+        // Set default value ke input hidden
+        $('#hidden-payment-method').val($('input[name="payment_method"]:checked').val());
     }
-    // Jalankan render pembayaran saat aplikasi pertama dimuat
     renderMetodePembayaran();
 
+    // FILTER KATEGORI PRODUK VIA JQUERY
+    $('.btn-category').on('click', function() {
+        $('.btn-category').removeClass('active');
+        $(this).addClass('active');
 
-    // LOGIKA OPEN/CLOSE MODAL MEJA
+        var kategoriTarget = $(this).data('target');
+
+        if (kategoriTarget === 'all') {
+            $('.product-button').hide().fadeIn(200);
+        } else {
+            $('.product-button').hide();
+            $(`.product-button[data-kategori="${kategoriTarget}"]`).fadeIn(200);
+        }
+    });
+
+    // MODAL EVENTS
     $('#trigger-modal-meja').on('click', function() {
         $('#modal-meja-overlay').css('display', 'flex').hide().fadeIn(150);
     });
@@ -176,26 +208,28 @@ $(document).ready(function() {
         if (e.target === this) { $('#modal-meja-overlay').fadeOut(150); }
     });
 
-    // AMBIL DATA PILIHAN MEJA MODAL
-    $('.meja-box').on('click', function() {
+    // PROSES PILIH MEJA
+    $(document).on('click', '.meja-box', function() {
         $('.meja-box').removeClass('selected');
         $(this).addClass('selected');
         $('#trigger-modal-meja').removeClass('shake-warning');
 
         var idMeja = $(this).data('meja-id');
         var statusMeja = $(this).data('status');
-        $('#hidden-table-id').val(idMeja);
+        var namaMejaTerpilih = $(this).find('.m-number').text() || `Meja M-0${idMeja}`;
+
+        $('#hidden-table-id').val(idMeja).attr('data-nama-meja-aktif', namaMejaTerpilih); 
         
         if (statusMeja === 'full') {
             $('#hidden-is-addon').val('1');
             $('#badge-order-type').fadeIn(150);
             $('#label-total-harga').text('Total Add-on');
-            $('#text-meja-terpilih').html(`Meja M-0${idMeja} <span style="color:var(--warning); font-weight:bold;">(Add-on)</span>`);
+            $('#text-meja-terpilih').html(`${namaMejaTerpilih} <span style="color:var(--warning); font-weight:bold;">(Add-on)</span>`);
         } else {
             $('#hidden-is-addon').val('0');
             $('#badge-order-type').fadeOut(150);
             $('#label-total-harga').text('Total Harga');
-            $('#text-meja-terpilih').text(`Meja M-0${idMeja} (Ready)`);
+            $('#text-meja-terpilih').text(`${namaMejaTerpilih} (Ready)`);
         }
 
         $('#modal-meja-overlay').fadeOut(150);
@@ -203,15 +237,7 @@ $(document).ready(function() {
         kalkulatorKembalian();
     });
 
-    function updateCounterMeja() {
-        var ready = $('.meja-grid-modal .meja-box.kosong').length;
-        var full = $('.meja-grid-modal .meja-box.terisi').length;
-        $('.badge-count.ready').text(ready);
-        $('.badge-count.full').text(full);
-    }
-    updateCounterMeja();
-
-    // MANAGEMENT SYSTEM LOCALSTORAGE REAL-TIME
+    // SIMPAN DATA KE LOCAL STORAGE
     function simpanKeLocalStorage() {
         var keranjang = [];
         $('.cart-item').each(function() {
@@ -222,11 +248,14 @@ $(document).ready(function() {
             keranjang.push({ id: id, nama: nama, harga: harga, qty: qty });
         });
 
-        var mejaTerpilih = $('.meja-box.selected').data('meja-id') || "";
-        var statusMeja = $('.meja-box.selected').data('status') || "ready";
+        var targetMejaActive = $('.meja-box.selected');
+        var mejaTerpilih = targetMejaActive.data('meja-id') || $('#hidden-table-id').val() || "";
+        var statusMeja = targetMejaActive.data('status') || ($('#hidden-is-addon').val() === '1' ? 'full' : 'ready');
+        var namaMejaTerpilih = $('#hidden-table-id').attr('data-nama-meja-aktif') || "";
 
         var dataKasir = {
             meja: mejaTerpilih,
+            namaMeja: namaMejaTerpilih,
             statusMeja: statusMeja,
             namaPelanggan: $('#input-nama').val(),
             metodeBayar: $('input[name="payment_method"]:checked').val(),
@@ -236,29 +265,32 @@ $(document).ready(function() {
         localStorage.setItem('kasir_terpadu_data', JSON.stringify(dataKasir));
     }
 
+    // LOAD DATA DARI LOCAL STORAGE
     function muatDariLocalStorage() {
         var dataLokal = localStorage.getItem('kasir_terpadu_data');
         if (!dataLokal) return;
         var data = JSON.parse(dataLokal);
         
-        if (data.meja) {
-            $(`.meja-box[data-meja-id="${data.meja}"]`).addClass('selected');
-            $('#hidden-table-id').val(data.meja);
+        if (data.meja && data.meja !== "") {
+            $('#hidden-table-id').val(data.meja).attr('data-nama-meja-aktif', data.namaMeja);
+            
             if(data.statusMeja === 'full') {
                 $('#hidden-is-addon').val('1');
                 $('#badge-order-type').show();
                 $('#label-total-harga').text('Total Add-on');
-                $('#text-meja-terpilih').html(`Meja M-0${data.meja} <span style="color:var(--warning); font-weight:bold;">(Add-on)</span>`);
+                $('#text-meja-terpilih').html(`${data.namaMeja || "Meja M-0"+data.meja} <span style="color:var(--warning); font-weight:bold;">(Add-on)</span>`);
             } else {
-                $('#text-meja-terpilih').text(`Meja M-0${data.meja} (Ready)`);
+                $('#hidden-is-addon').val('0');
+                $('#badge-order-type').hide();
+                $('#label-total-harga').text('Total Harga');
+                $('#text-meja-terpilih').text(`${data.namaMeja || "Meja M-0"+data.meja} (Ready)`);
             }
         }
 
-        $('#input-nama').val(data.namaPelanggan).trigger('input');
-        $('#input-cash').val(data.uangTunai);
+        $('#input-nama').val(data.namaPelanggan || "").trigger('input');
+        $('#input-cash').val(data.uangTunai || "0");
         
-        // Pastikan radio button dicentang sesuai localstorage jika metodenya terdaftar di Array
-        if ($(`input[name="payment_method"][value="${data.metodeBayar}"]`).length > 0) {
+        if (data.metodeBayar && $(`input[name="payment_method"][value="${data.metodeBayar}"]`).length > 0) {
             $(`input[name="payment_method"][value="${data.metodeBayar}"]`).prop('checked', true);
         }
         $(`input[name="payment_method"]:checked`).trigger('change');
@@ -280,18 +312,26 @@ $(document).ready(function() {
         hitungTotalNota();
     }
 
-    $('#input-nama').on('input', function() { $('#hidden-customer-name').val($(this).val()); simpanKeLocalStorage(); });
+    // LIVE SYNC NAMA PELANGGAN
+    $('#input-nama').on('input', function() { 
+        $('#hidden-customer-name').val($(this).val()); 
+        simpanKeLocalStorage(); 
+    });
 
-    // EVENT DETECT UNTUK METODE BAYAR YANG DINAMIS
+    // DETEKSI METODE BAYAR CHANGED
     $(document).on('change', 'input[name="payment_method"]', function() {
         var tipe = $(this).val();
         $('#hidden-payment-method').val(tipe);
-        if(tipe !== 'tunai') { $('.section-kalkulator').hide(); } else { $('.section-kalkulator').show(); }
+        if(tipe !== 'tunai') { 
+            $('.section-kalkulator').hide(); 
+        } else { 
+            $('.section-kalkulator').show(); 
+        }
         kalkulatorKembalian();
         simpanKeLocalStorage();
     });
 
-    // MENANGGAPI PILIHAN PRODUK
+    // TAMBAH KE KERANJANG
     $('.product-button').on('click', function() {
         var idMejaTerpilih = $('#hidden-table-id').val();
         if(!idMejaTerpilih) {
@@ -326,6 +366,7 @@ $(document).ready(function() {
         simpanKeLocalStorage();
     });
 
+    // BUTTON PLUS MINUS QTY
     $(document).on('click', '.btn-plus', function() {
         var id = $(this).data('id'); var item = $('#cart-' + id); var input = item.find('.input-qty');
         var qty = parseInt(input.val()) + 1; input.val(qty); item.find('.text-qty').text(qty);
@@ -342,7 +383,7 @@ $(document).ready(function() {
         hitungTotalNota(); simpanKeLocalStorage();
     });
 
-    // HITUNG MATEMATIKA NOTA & KEMBALIAN
+    // KALKULATOR TOTAL NOTA & KEMBALIAN
     function hitungTotalNota() {
         var total = 0;
         $('.cart-item').each(function() { total += (parseInt($(this).data('harga')) * parseInt($(this).find('.input-qty').val())); });
@@ -356,11 +397,18 @@ $(document).ready(function() {
     function kalkulatorKembalian() {
         var total = parseInt($('#num-total-harga').val()) || 0;
         var metodeBayar = $('#hidden-payment-method').val();
-        if (metodeBayar !== 'tunai') { $('#text-kembalian').removeClass('minus').text('Rp 0 (Non-Tunai)'); validasiTombol(); return; }
+        if (metodeBayar !== 'tunai') { 
+            $('#text-kembalian').removeClass('minus').text('Rp 0 (Non-Tunai)'); 
+            validasiTombol(); 
+            return; 
+        }
         var bayar = parseInt($('#input-cash').val()) || 0;
         var sisa = bayar - total;
-        if(sisa < 0) { $('#text-kembalian').addClass('minus').text('Uang Kurang: -Rp ' + Math.abs(sisa).toLocaleString('id-ID')); }
-        else { $('#text-kembalian').removeClass('minus').text('Rp ' + sisa.toLocaleString('id-ID')); }
+        if(sisa < 0) { 
+            $('#text-kembalian').addClass('minus').text('Uang Kurang: -Rp ' + Math.abs(sisa).toLocaleString('id-ID')); 
+        } else { 
+            $('#text-kembalian').removeClass('minus').text('Rp ' + sisa.toLocaleString('id-ID')); 
+        }
         validasiTombol();
     }
 
@@ -369,15 +417,18 @@ $(document).ready(function() {
         var totalHarga = parseInt($('#num-total-harga').val()) || 0;
         var uangBayar = parseInt($('#input-cash').val()) || 0;
         var metodeBayar = $('#hidden-payment-method').val();
+        
         if (totalItem === 0) { $('#btn-aksi-utama').prop('disabled', true); return; }
-        if (metodeBayar === 'tunai' && uangBayar < totalHarga) { $('#btn-aksi-utama').prop('disabled', true); }
-        else { $('#btn-aksi-utama').prop('disabled', false); }
+        if (metodeBayar === 'tunai' && uangBayar < totalHarga) { 
+            $('#btn-aksi-utama').prop('disabled', true); 
+        } else { 
+            $('#btn-aksi-utama').prop('disabled', false); 
+        }
     }
     
-    // Tarik data localstorage pasca reload
     muatDariLocalStorage();
 
-    // AJAX POST SUBMIT DATA
+    // SUBMIT FORM KASIR (AJAX)
     $('#form-kasir').on('submit', function(e) {
         e.preventDefault();
         var dataSerialize = $(this).serialize();
@@ -387,18 +438,21 @@ $(document).ready(function() {
                 if(res.trim() === "SUKSES") {
                     alert('Transaksi Berhasil Diproses!');
                     localStorage.removeItem('kasir_terpadu_data');
+                    
+                    // Reset Form DOM secara bersih
                     $('#form-kasir')[0].reset();
+                    $('#input-nama').val('');
+                    $('#hidden-customer-name').val('');
+                    
                     $('.meja-box').removeClass('selected');
-                    $('#hidden-table-id').val('');
+                    $('#hidden-table-id').val('').removeAttr('data-nama-meja-aktif');
                     $('#hidden-is-addon').val('0');
                     $('#badge-order-type').hide();
                     $('#label-total-harga').text('Total Harga');
                     $('#text-meja-terpilih').text('Klik Pilih Meja...');
-                    $('#input-nama').val('').trigger('input');
                     
-                    // Reset ke metode bayar default di dalam array
                     renderMetodePembayaran();
-                    $(`input[name="payment_method"]:checked`).trigger('change');
+                    $('input[name="payment_method"][value="tunai"]').prop('checked', true).trigger('change');
 
                     $('#box-item-belanja').html('<p class="empty-text">Keranjang masih kosong</p>');
                     $('#input-cash').val('0');
@@ -410,11 +464,36 @@ $(document).ready(function() {
     });
 });
 
+// RE-RENDER LIVE UPDATE DARI REALTIME POLLING
+function renderMejaLiveUpdate(responServer) {
+    var dataMeja = responServer.list_meja;
+    if (!dataMeja) return;
+
+    var container = $('#kontainer-meja-live');
+    var mejaTerpilihSaatIni = $('#hidden-table-id').val(); 
+    container.empty();
+
+    dataMeja.forEach(function(meja) {
+        var isAvailable = (meja.status === 'available');
+        var statusClass = isAvailable ? 'kosong' : 'terisi';
+        var statusText = isAvailable ? 'Ready' : 'Full';
+        var dataStatusValue = isAvailable ? 'ready' : 'full';
+
+        var selectedClass = (meja.id == mejaTerpilihSaatIni) ? 'selected' : '';
+
+        var html = `
+            <div class="meja-box ${statusClass} ${selectedClass}" data-meja-id="${meja.id}" data-status="${dataStatusValue}">
+                <span class="m-number">${meja.nomeja}</span>
+                <span class="m-status">Kapasitas : ${meja.kapasitas}</span>
+                <span class="m-status">${statusText}</span>
+            </div>`;
+        container.append(html);
+    });
+}
+
+// REAL-TIME POLLING SINKRONISASI MEJA
 $(document).ready(function() {
-    let nilaiLamaIsi = null;
-    let nilaiLamaKsg = null;
-    let nilaiWaktu = null;
-    const globaltoken = '<?php echo $_SESSION['globaltoken']; ?>';
+    const globaltoken = '<?php echo isset($_SESSION['globaltoken']) ? $_SESSION['globaltoken'] : ""; ?>';
     const targetSync = $('#target-sync').val();
 
     function fetchData() {
@@ -428,19 +507,24 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function(respon) {
-                if (respon.status === 'success') {
-                    console.log('syncing');
+                if (respon.status === 'success' || respon.list_meja) {
+                    console.log('Syncing data meja dengan dapur berhasil...');
+                    var nilaiIsi = (respon.nilai_isi) ? respon.nilai_isi : 0;
+                    var nilaiKsg = (respon.nilai_ksg) ? respon.nilai_ksg : 0;
+        
+                    $('.badge-count.ready').text(nilaiKsg);
+                    $('.badge-count.full').text(nilaiIsi);
+                    
+                    renderMejaLiveUpdate(respon);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Koneksi gagal atau file tidak ditemukan:', error);
+                console.error('Respon kotor / Error dari server:', xhr.responseText);
             },
             complete: function() {
-                const halamanMejaMasihAktif = document.getElementById('box-denah-meja');
-                if (halamanMejaMasihAktif) {
-                    setTimeout(fetchData, 5000);
-                } else {
-                    console.log('Halaman Manajemen Meja sudah tidak aktif. Polling dihentikan.');
+                // Pastikan element masih eksis di DOM sebelum loop interval berjalan lagi
+                if (document.getElementById('section-pelanggan')) {
+                    setTimeout(fetchData, 5000); 
                 }
             }
         });
@@ -448,7 +532,6 @@ $(document).ready(function() {
 
     fetchData();
 });
-
 </script>
 </body>
 </html>

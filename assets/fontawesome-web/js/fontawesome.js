@@ -1103,7 +1103,7 @@
   var PSEUDO_ELEMENTS = ['::before', '::after', ':before', ':after'];
   var PRODUCTION = function () {
     try {
-      return "production" === 'production';
+      return undefined === 'production';
     } catch (e$$1) {
       return false;
     }
