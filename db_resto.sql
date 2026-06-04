@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1deb3
+-- version 5.2.3deb1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Waktu pembuatan: 29 Bulan Mei 2026 pada 19.02
--- Versi server: 8.0.45-0ubuntu0.24.04.1
--- Versi PHP: 8.3.6
+-- Waktu pembuatan: 04 Jun 2026 pada 02.52
+-- Versi server: 8.4.9-0ubuntu0.26.04.1
+-- Versi PHP: 8.5.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,8 +18,20 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `db_resto`
+-- Basis data: `db_resto`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `global_settings`
+--
+
+CREATE TABLE `global_settings` (
+  `id` int NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -31,9 +43,9 @@ CREATE TABLE `orders` (
   `id` int NOT NULL,
   `table_id` int NOT NULL,
   `waiter_id` int DEFAULT NULL,
-  `customer_name` varchar(50) COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `customer_name` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
   `total_amount` decimal(10,2) DEFAULT '0.00',
-  `order_status` enum('pending','completed','cancelled') COLLATE utf8mb3_unicode_ci DEFAULT 'pending',
+  `order_status` enum('pending','completed','cancelled') CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
@@ -110,10 +122,10 @@ CREATE TABLE `tables` (
 
 CREATE TABLE `users` (
   `id` int NOT NULL,
-  `username` varchar(50) COLLATE utf8mb3_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb3_unicode_ci NOT NULL,
-  `name` varchar(100) COLLATE utf8mb3_unicode_ci NOT NULL,
-  `role` enum('admin','cashier','waiter','kitchen','owner') COLLATE utf8mb3_unicode_ci NOT NULL,
+  `username` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `role` enum('admin','cashier','waiter','kitchen','owner') CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `is_active` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -127,8 +139,14 @@ INSERT INTO `users` (`id`, `username`, `password`, `name`, `role`, `is_active`, 
 (1, 'admin', '$2y$10$zIfiyx70sE3P0teNv6BFIOOp2B.MOD5vG4dJzB2ygWvr7.UvXW7Vm', 'Admin', 'admin', 1, '2026-05-21 06:34:20', '2026-05-21 06:34:20');
 
 --
--- Indexes for dumped tables
+-- Indeks untuk tabel yang dibuang
 --
+
+--
+-- Indeks untuk tabel `global_settings`
+--
+ALTER TABLE `global_settings`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indeks untuk tabel `orders`
@@ -177,6 +195,12 @@ ALTER TABLE `users`
 --
 -- AUTO_INCREMENT untuk tabel yang dibuang
 --
+
+--
+-- AUTO_INCREMENT untuk tabel `global_settings`
+--
+ALTER TABLE `global_settings`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `orders`
