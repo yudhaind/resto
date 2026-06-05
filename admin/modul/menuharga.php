@@ -8,7 +8,7 @@
             </button>
         </div>
 
-        <div class="table-responsive" id="table-product">
+        <div class="table-responsive" id="table-product" style="overflow-y: auto; max-height: 60vh;">
          <?php include('admin/modul/list_produk.php'); ?>
         </div>
     </div>

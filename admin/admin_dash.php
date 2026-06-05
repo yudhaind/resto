@@ -30,7 +30,7 @@ $hasil=fetchOne($sql);
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <i class="fa-solid fa-shop"></i><?= $hasil['value']; ?>
+            <i class="fa-solid fa-shop"></i><span id="nama-toko"><?= $hasil['value']; ?></span>
         </div>
         <ul class="sidebar-menu">
             <li class="active"><a href="#" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> Ringkasan</a></li>

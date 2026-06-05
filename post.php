@@ -143,7 +143,7 @@ if ($tokenform !== $_SESSION['token']) {
         $price=$_POST['price'];
         $status=$_POST['status'];
         $price=str_replace(".","",$price);
-        $sql="INSERT INTO products (name, category, price, is_available) VALUES ( ?, ?, ?, ?);";
+        $sql="INSERT INTO products (name, category, price, is_available, images) VALUES ( ?, ?, ?, ?, '');";
         if (query($sql,[$namamenu, $cat, $price, $status])){
             echo '<div class="ok-message">Produk Berhasil ditambahkan</div>';
         } else {
@@ -161,6 +161,14 @@ if ($tokenform !== $_SESSION['token']) {
         $sql="UPDATE `products` SET `name` = ?, `category` = ?, `price` = ?, `is_available` = ? WHERE `products`.`id` = ?";
         if (query($sql,[$namamenu, $cat, $price, $status, $id_item])) {
             echo '<div class="ok-message">Item Berhasil di ubah</div>';
+        } else {
+            echo '<div class="error-message">Data gagal di update</div>';
+        }
+    } else if ($action=='edit_namatoko') {
+        $namatoko=$_POST['namatoko'] ?? '';
+        $sql="UPDATE global_settings SET value = ? WHERE label = 'nama_toko'";
+        if (query($sql,[$namatoko])) {
+            echo '<div class="ok-message">Nama Toko Berhasil di ubah</div>';
         } else {
             echo '<div class="error-message">Data gagal di update</div>';
         }

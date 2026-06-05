@@ -15,7 +15,7 @@
                 </button>
             </div>
         </div>
-        <div class="table-responsive" id="table-user">
+        <div class="table-responsive" id="table-user" style="overflow-y: auto; max-height: 60vh;">
             <?php include('admin/modul/list_user.php'); ?>
         </div>
     </div>

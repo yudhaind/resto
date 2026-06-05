@@ -61,7 +61,7 @@ function submitForm(formSelector, resultTarget, preform, callback) {
                     // Jika ada class .ok-message, jalankan hitung mundur closeLightbox
                     setTimeout(function () {
                         closeLightbox(); 
-                    }, 2000); // 2000 ms = 2 detik
+                    }, 1000); // 1000 ms = 1 detik
                     
                 }
 
