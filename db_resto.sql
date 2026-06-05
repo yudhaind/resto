@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Waktu pembuatan: 04 Jun 2026 pada 02.52
+-- Waktu pembuatan: 05 Jun 2026 pada 09.04
 -- Versi server: 8.4.9-0ubuntu0.26.04.1
 -- Versi PHP: 8.5.4
 
@@ -32,6 +32,13 @@ CREATE TABLE `global_settings` (
   `label` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data untuk tabel `global_settings`
+--
+
+INSERT INTO `global_settings` (`id`, `label`, `value`) VALUES
+(1, 'nama_toko', 'Resto Mantab Jaya');
 
 -- --------------------------------------------------------
 
@@ -96,8 +103,19 @@ CREATE TABLE `products` (
   `price` decimal(10,2) NOT NULL,
   `is_available` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `images` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data untuk tabel `products`
+--
+
+INSERT INTO `products` (`id`, `name`, `category`, `price`, `is_available`, `created_at`, `updated_at`, `images`) VALUES
+(1, 'Nasi Goreng', 'food', 25000.00, 1, '2026-06-04 06:38:17', '2026-06-04 06:38:17', ''),
+(2, 'Es Jeruk', 'drink', 8000.00, 1, '2026-06-04 06:38:41', '2026-06-04 06:38:41', ''),
+(3, 'Kentang Goreng', 'snack', 15000.00, 1, '2026-06-04 06:39:00', '2026-06-04 06:39:00', ''),
+(4, 'Puding', 'dessert', 10000.00, 1, '2026-06-04 06:39:17', '2026-06-04 06:39:17', '');
 
 -- --------------------------------------------------------
 
@@ -113,6 +131,17 @@ CREATE TABLE `tables` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data untuk tabel `tables`
+--
+
+INSERT INTO `tables` (`id`, `table_number`, `capacity`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Meja 1', 2, 'available', '2026-06-04 06:32:30', '2026-06-04 06:36:41'),
+(2, 'Meja 2', 2, 'available', '2026-06-04 06:32:40', '2026-06-04 06:36:42'),
+(3, 'Meja 3', 4, 'available', '2026-06-04 06:34:51', '2026-06-04 06:36:43'),
+(4, 'Meja 4', 4, 'available', '2026-06-04 06:37:06', '2026-06-04 06:37:06'),
+(5, 'Meje 5', 4, 'available', '2026-06-04 06:37:40', '2026-06-04 06:37:40');
 
 -- --------------------------------------------------------
 
@@ -136,7 +165,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `name`, `role`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2y$10$zIfiyx70sE3P0teNv6BFIOOp2B.MOD5vG4dJzB2ygWvr7.UvXW7Vm', 'Admin', 'admin', 1, '2026-05-21 06:34:20', '2026-05-21 06:34:20');
+(1, 'admin', '$2y$10$zIfiyx70sE3P0teNv6BFIOOp2B.MOD5vG4dJzB2ygWvr7.UvXW7Vm', 'Yudha Indharmawan', 'admin', 1, '2026-05-21 06:34:20', '2026-06-05 08:40:38'),
+(2, 'kasir', '$2y$12$RkuaZbMpSWLQmZfokmi7me6GHIFPL0edWga0/ynnpmYJDuZm/dbzG', 'Nama Kasir', 'cashier', 1, '2026-06-04 06:34:16', '2026-06-04 06:34:16');
 
 --
 -- Indeks untuk tabel yang dibuang
@@ -200,7 +230,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT untuk tabel `global_settings`
 --
 ALTER TABLE `global_settings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT untuk tabel `orders`
@@ -224,19 +254,19 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT untuk tabel `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT untuk tabel `tables`
 --
 ALTER TABLE `tables`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
