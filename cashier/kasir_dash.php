@@ -18,6 +18,7 @@ $enum_array = explode(",", $cleaned);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Kasir Modern - Flexible Payment & Compact</title>
     <link rel="stylesheet" href="assets/css/kasirstyle.css">
+    <script src="assets/js/jquery-4.0.0.min.js"></script>
 </head>
 <body>
 
@@ -156,7 +157,6 @@ $enum_array = explode(",", $cleaned);
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
 
