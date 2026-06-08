@@ -1,5 +1,7 @@
 <?php
 // Diasumsikan session_start() sudah dipanggil di file sebelum ini jika menggunakan $_SESSION
+$tokenform  = bin2hex(random_bytes(16)); // Generate token acak untuk form
+$_SESSION['token'] = $tokenform; // Simpan token di session untuk validasi nanti
 $sql = "SELECT COLUMN_TYPE
     FROM information_schema.COLUMNS
     WHERE TABLE_SCHEMA = 'db_resto'
@@ -103,13 +105,13 @@ $enum_array = explode(",", $cleaned);
             <h2>3. Ringkasan Pesanan</h2>
             <form id="form-kasir">
                 <div id="badge-order-type" class="badge-addon" style="display: none;">PESANAN TAMBAHAN (ADD-ON)</div>
-
+                <input type="hidden" name="tokenform" id="tokenform" value="<?= $tokenform ?>">
                 <input type="hidden" name="table_id" id="hidden-table-id" value="">
                 <input type="hidden" name="cashier_id" value="1">
                 <input type="hidden" name="customer_name" id="hidden-customer-name" value="">
                 <input type="hidden" name="payment_method_selected" id="hidden-payment-method" value="tunai">
                 <input type="hidden" name="is_addon" id="hidden-is-addon" value="0">
-
+                <input type="hidden" name="action" id="hidden-action" value="submit_order">
                 <div id="box-item-belanja">
                     <p class="empty-text">Keranjang masih kosong</p>
                 </div>
@@ -127,7 +129,8 @@ $enum_array = explode(",", $cleaned);
                     </div>
                     <div class="calc-row section-kalkulator" style="margin-top: 8px;">
                         <label style="margin: 0; font-weight: 600;">Uang Tunai</label>
-                        <input type="number" name="amount_paid" id="input-cash" class="input-money" value="0" min="0">
+                        <input type="text" name="amount_paid_display" id="input-cash" class="input-money" value="0" placeholder="0">
+                        <input type="hidden" name="amount_paid" id="hidden-amount-paid" value="0">
                     </div>
                     <div class="calc-row section-kalkulator" style="border-top: 1px dashed var(--border); padding-top: 8px;">
                         <span>Kembalian</span>
@@ -259,7 +262,7 @@ $(document).ready(function() {
             statusMeja: statusMeja,
             namaPelanggan: $('#input-nama').val(),
             metodeBayar: $('input[name="payment_method"]:checked').val(),
-            uangTunai: $('#input-cash').val(),
+            uangTunai: getRawAmountPaid(),
             itemBelanja: keranjang
         };
         localStorage.setItem('kasir_terpadu_data', JSON.stringify(dataKasir));
@@ -288,7 +291,9 @@ $(document).ready(function() {
         }
 
         $('#input-nama').val(data.namaPelanggan || "").trigger('input');
-        $('#input-cash').val(data.uangTunai || "0");
+        var uangTunai = (data.uangTunai && data.uangTunai !== "") ? data.uangTunai.toString() : '0';
+        $('#hidden-amount-paid').val(uangTunai);
+        $('#input-cash').val(uangTunai === '0' ? '0' : formatRupiah(uangTunai));
         
         if (data.metodeBayar && $(`input[name="payment_method"][value="${data.metodeBayar}"]`).length > 0) {
             $(`input[name="payment_method"][value="${data.metodeBayar}"]`).prop('checked', true);
@@ -392,7 +397,51 @@ $(document).ready(function() {
         kalkulatorKembalian();
     }
 
-    $('#input-cash').on('input', function() { kalkulatorKembalian(); simpanKeLocalStorage(); });
+    function formatRupiah(angka) {
+        return angka.toString().replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function unformatNumber(nilai) {
+        return nilai.toString().replace(/[^0-9]/g, '');
+    }
+
+    function getRawAmountPaid() {
+        return unformatNumber($('#hidden-amount-paid').val()) || '0';
+    }
+
+    function updateAmountPaid(rawValue) {
+        rawValue = unformatNumber(rawValue);
+        if (rawValue === '') {
+            rawValue = '0';
+        }
+        $('#hidden-amount-paid').val(rawValue);
+        $('#input-cash').val(rawValue === '0' ? '0' : formatRupiah(rawValue));
+    }
+
+    $('#input-cash').on('focus', function() {
+        var raw = unformatNumber($(this).val());
+        if (raw === '0') {
+            $(this).val('');
+        }
+    });
+
+    $('#input-cash').on('blur', function() {
+        var raw = unformatNumber($(this).val());
+        updateAmountPaid(raw);
+    });
+
+    $('#input-cash').on('input', function() {
+        var raw = unformatNumber($(this).val());
+        if (raw === '') {
+            $('#hidden-amount-paid').val('0');
+            $(this).val('');
+        } else {
+            $('#hidden-amount-paid').val(raw);
+            $(this).val(formatRupiah(raw));
+        }
+        kalkulatorKembalian();
+        simpanKeLocalStorage();
+    });
 
     function kalkulatorKembalian() {
         var total = parseInt($('#num-total-harga').val()) || 0;
@@ -402,7 +451,7 @@ $(document).ready(function() {
             validasiTombol(); 
             return; 
         }
-        var bayar = parseInt($('#input-cash').val()) || 0;
+        var bayar = parseInt(getRawAmountPaid()) || 0;
         var sisa = bayar - total;
         if(sisa < 0) { 
             $('#text-kembalian').addClass('minus').text('Uang Kurang: -Rp ' + Math.abs(sisa).toLocaleString('id-ID')); 
@@ -415,7 +464,7 @@ $(document).ready(function() {
     function validasiTombol() {
         var totalItem = $('.cart-item').length;
         var totalHarga = parseInt($('#num-total-harga').val()) || 0;
-        var uangBayar = parseInt($('#input-cash').val()) || 0;
+        var uangBayar = parseInt(getRawAmountPaid()) || 0;
         var metodeBayar = $('#hidden-payment-method').val();
         
         if (totalItem === 0) { $('#btn-aksi-utama').prop('disabled', true); return; }
@@ -433,7 +482,7 @@ $(document).ready(function() {
         e.preventDefault();
         var dataSerialize = $(this).serialize();
         $.ajax({
-            url: 'simpan_pesanan.php', type: 'POST', data: dataSerialize,
+            url: 'post.php', type: 'POST', data: dataSerialize,
             success: function(res) {
                 if(res.trim() === "SUKSES") {
                     alert('Transaksi Berhasil Diproses!');
@@ -455,6 +504,7 @@ $(document).ready(function() {
                     $('input[name="payment_method"][value="tunai"]').prop('checked', true).trigger('change');
 
                     $('#box-item-belanja').html('<p class="empty-text">Keranjang masih kosong</p>');
+                    $('#hidden-amount-paid').val('0');
                     $('#input-cash').val('0');
                     hitungTotalNota();
                 } else { alert('Gagal: ' + res); }
