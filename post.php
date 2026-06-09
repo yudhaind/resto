@@ -176,10 +176,10 @@ if ($tokenform !== $_SESSION['token']) {
         $table_id = $_POST['table_id'] ?? '';
         $cashier_id = $_POST['cashier_id'] ?? '';
         $customer_name = trim($_POST['customer_name'] ?? '');
+        $notes = $_POST['notes'] ?? [];
         $payment_method_selected = $_POST['payment_method_selected'] ?? '';
         $is_addon = $_POST['is_addon'] ?? '0';
         $product_ids = $_POST['product_id'] ?? [];
-        $prices = $_POST['price'] ?? [];
         $quantities = $_POST['quantity'] ?? [];
         $amount_paid = $_POST['amount_paid'] ?? '0';
 
@@ -199,6 +199,26 @@ if ($tokenform !== $_SESSION['token']) {
         }
         $payment_method = $paymentMap[$payment_method_selected];
 
+        $sqlTable = "SELECT status FROM `tables` WHERE `id` = ?";
+        $tableData = fetchOne($sqlTable, [$table_id]);
+        if (!$tableData) {
+            echo 'ERROR: Meja tidak ditemukan';
+            exit;
+        }
+
+        $table_status = $tableData['status'];
+        $existing_order_id = null;
+        if ($table_status === 'occupied') {
+            $sqlExistingOrder = "SELECT id FROM `orders` WHERE table_id = ? ORDER BY id DESC LIMIT 1";
+            $existingData = fetchOne($sqlExistingOrder, [$table_id]);
+            if ($existingData) {
+                $existing_order_id = $existingData['id'];
+            }
+        } elseif ($table_status !== 'available') {
+            echo 'ERROR: Status meja tidak valid';
+            exit;
+        }
+
         $amount_paid = preg_replace('/[^0-9.]/', '', $amount_paid);
         if ($amount_paid === '') {
             $amount_paid = 0;
@@ -206,8 +226,27 @@ if ($tokenform !== $_SESSION['token']) {
         $amount_paid = number_format((float)$amount_paid, 2, '.', '');
 
         $countItems = count($product_ids);
-        if (count($prices) !== $countItems || count($quantities) !== $countItems) {
+        if (count($quantities) !== $countItems) {
             echo 'ERROR: Data item pesanan tidak valid';
+            exit;
+        }
+
+        $uniqueProductIds = array_values(array_unique(array_map('intval', $product_ids)));
+        if (count($uniqueProductIds) === 0) {
+            echo 'ERROR: Data item pesanan tidak valid';
+            exit;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($uniqueProductIds), '?'));
+        $sqlProducts = "SELECT id, price FROM products WHERE id IN ($placeholders)";
+        $productRows = fetchAll($sqlProducts, $uniqueProductIds);
+        $productPrices = [];
+        foreach ($productRows as $row) {
+            $productPrices[intval($row['id'])] = $row['price'];
+        }
+
+        if (count($productPrices) !== count($uniqueProductIds)) {
+            echo 'ERROR: Produk tidak valid';
             exit;
         }
 
@@ -215,20 +254,27 @@ if ($tokenform !== $_SESSION['token']) {
         $order_items = [];
         for ($i = 0; $i < $countItems; $i++) {
             $product_id = intval($product_ids[$i]);
-            $price = str_replace(['.', ','], ['', '.'], $prices[$i]);
             $quantity = intval($quantities[$i]);
+            $item_note = trim($notes[$i] ?? '');
 
-            if ($product_id <= 0 || $quantity <= 0 || floatval($price) <= 0) {
-                continue;
+            if ($product_id <= 0 || $quantity <= 0 || !isset($productPrices[$product_id])) {
+                echo 'ERROR: Produk tidak valid';
+                exit;
             }
 
-            $price = number_format((float)$price, 2, '.', '');
+            $price = number_format((float)$productPrices[$product_id], 2, '.', '');
+            if (floatval($price) <= 0) {
+                echo 'ERROR: Harga produk tidak valid';
+                exit;
+            }
+
             $subtotal = $price * $quantity;
             $total_amount += $subtotal;
             $order_items[] = [
                 'product_id' => $product_id,
                 'quantity' => $quantity,
-                'price_at_order' => $price
+                'price_at_order' => $price,
+                'note' => $item_note
             ];
         }
 
@@ -245,22 +291,31 @@ if ($tokenform !== $_SESSION['token']) {
         try {
             beginTransaction();
 
-            $order_status = 'completed';
-            $sqlOrder = "INSERT INTO `orders` (`table_id`, `waiter_id`, `customer_name`, `total_amount`, `order_status`) VALUES (?, ?, ?, ?, ?);";
-            query($sqlOrder, [$table_id, $cashier_id, $customer_name, number_format($total_amount, 2, '.', ''), $order_status]);
-            $order_id = lastInsertId();
+            if ($existing_order_id === null) {
+                $order_status = 'completed';
+                $sqlOrder = "INSERT INTO `orders` (`table_id`, `waiter_id`, `customer_name`, `total_amount`, `order_status`) VALUES (?, ?, ?, ?, ?);";
+                query($sqlOrder, [$table_id, $cashier_id, $customer_name, number_format($total_amount, 2, '.', ''), $order_status]);
+                $order_id = lastInsertId();
+            } else {
+                $order_id = $existing_order_id;
+                $sqlUpdateOrder = "UPDATE `orders` SET total_amount = total_amount + ? WHERE id = ?";
+                query($sqlUpdateOrder, [number_format($total_amount, 2, '.', ''), $order_id]);
+            }
 
-            $sqlDetail = "INSERT INTO `order_details` (`order_id`, `product_id`, `quantity`, `price_at_order`) VALUES (?, ?, ?, ?);";
+            $sqlDetail = "INSERT INTO `order_details` (`order_id`, `product_id`, `quantity`, `price_at_order`, `notes`) VALUES (?, ?, ?, ?, ?);";
             foreach ($order_items as $item) {
-                query($sqlDetail, [$order_id, $item['product_id'], $item['quantity'], $item['price_at_order']]);
+                $item_note = isset($item['note']) ? $item['note'] : '';
+                query($sqlDetail, [$order_id, $item['product_id'], $item['quantity'], $item['price_at_order'], $item_note]);
             }
 
             $change_amount = number_format(floatval($amount_paid) - $total_amount, 2, '.', '');
             $sqlPayment = "INSERT INTO `payments` (`order_id`, `cashier_id`, `payment_method`, `amount_paid`, `change_amount`) VALUES (?, ?, ?, ?, ?);";
             query($sqlPayment, [$order_id, $cashier_id, $payment_method, $amount_paid, $change_amount]);
 
-            $change_status_table="UPDATE `tables` SET `status` = 'occupied' WHERE `tables`.`id` = ?";
-            query($change_status_table,[$table_id]);
+            if ($existing_order_id === null) {
+                $change_status_table="UPDATE `tables` SET `status` = 'occupied' WHERE `tables`.`id` = ?";
+                query($change_status_table,[$table_id]);
+            }
 
             commit();
             echo 'SUKSES';

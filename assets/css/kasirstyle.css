@@ -316,3 +316,22 @@ body {
 
 @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
 .shake-warning { animation: shake 0.4s ease-in-out; border-color: var(--danger) !important; }
+
+/* Per-item note compact styling */
+.cart-note{ margin-top:5px; }
+.cart-note textarea.input-note{
+    width:100%;
+    min-height:30px;
+    padding:6px;
+    border:1px solid #e6e6e6;
+    border-radius:6px;
+    font-size:0.9rem;
+    line-height:1.15;
+    resize:vertical;
+    box-sizing:border-box;
+}
+.cart-note .note-meta{
+    display:flex; justify-content:flex-end; align-items:center;
+    margin-top:4px; font-size:0.78rem; color:#666;
+}
+.note-count{ margin-left:6px; }

@@ -116,6 +116,8 @@ $enum_array = explode(",", $cleaned);
                     <p class="empty-text">Keranjang masih kosong</p>
                 </div>
 
+                <!-- Catatan sekarang per-item; global textarea removed -->
+
                 <div class="form-group" style="margin-top: 14px;">
                     <label>Metode Pembayaran</label>
                     <div class="option-container" id="payment-options-wrapper"></div>
@@ -187,6 +189,10 @@ $(document).ready(function() {
     }
     renderMetodePembayaran();
 
+    function generateCartRowKey(productId) {
+        return productId + '-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+    }
+
     // FILTER KATEGORI PRODUK VIA JQUERY
     $('.btn-category').on('click', function() {
         $('.btn-category').removeClass('active');
@@ -244,11 +250,13 @@ $(document).ready(function() {
     function simpanKeLocalStorage() {
         var keranjang = [];
         $('.cart-item').each(function() {
-            var id = $(this).attr('id').replace('cart-', '');
+            var rowKey = $(this).attr('id').replace('cart-', '');
+            var productId = $(this).find('input[name="product_id[]"]').val();
             var nama = $(this).find('.cart-name').text();
             var harga = parseInt($(this).data('harga'));
             var qty = parseInt($(this).find('.input-qty').val());
-            keranjang.push({ id: id, nama: nama, harga: harga, qty: qty });
+            var note = $(this).find('.input-note').val() || '';
+            keranjang.push({ rowKey: rowKey, productId: productId, nama: nama, harga: harga, qty: qty, note: note });
         });
 
         var targetMejaActive = $('.meja-box.selected');
@@ -302,17 +310,23 @@ $(document).ready(function() {
 
         if (data.itemBelanja && data.itemBelanja.length > 0) {
             $('.empty-text').remove();
-            data.itemBelanja.forEach(function(item) {
-                var html = `
-                    <div class="cart-item" id="cart-${item.id}" data-harga="${item.harga}">
-                        <div class="cart-info"><div class="cart-name">${item.nama}</div><div class="cart-price">Rp ${item.harga.toLocaleString('id-ID')}</div></div>
-                        <div class="cart-qty-controls">
-                            <input type="hidden" name="product_id[]" value="${item.id}"><input type="hidden" name="price[]" value="${item.harga}"><input type="hidden" name="quantity[]" value="${item.qty}" class="input-qty">
-                            <button type="button" class="btn-qty btn-min" data-id="${item.id}">-</button><span class="text-qty">${item.qty}</span><button type="button" class="btn-qty btn-plus" data-id="${item.id}">+</button>
-                        </div>
-                    </div>`;
-                $('#box-item-belanja').append(html);
-            });
+                    data.itemBelanja.forEach(function(item) {
+                    var noteValue = item.note ? item.note : '';
+                    var rowKey = item.rowKey || generateCartRowKey(item.productId);
+                    var html = `
+                        <div class="cart-item" id="cart-${rowKey}" data-harga="${item.harga}">
+                            <div class="cart-info"><div class="cart-name">${item.nama}</div><div class="cart-price">Rp ${item.harga.toLocaleString('id-ID')}</div></div>
+                            <div class="cart-qty-controls">
+                                <input type="hidden" name="product_id[]" value="${item.productId}"><input type="hidden" name="price[]" value="${item.harga}"><input type="hidden" name="quantity[]" value="${item.qty}" class="input-qty">
+                                <button type="button" class="btn-qty btn-min" data-row-key="${rowKey}">-</button><span class="text-qty">${item.qty}</span><button type="button" class="btn-qty btn-plus" data-row-key="${rowKey}">+</button>
+                            </div>
+                                    <div class="cart-note" style="margin-top:6px;">
+                                        <textarea name="notes[]" class="input-note" maxlength="200" placeholder="Catatan (opsional)" style="width:100%; min-height:30px; padding:6px; border:1px solid #e0e0e0; border-radius:6px; font-size:0.9rem; line-height:1.15;">${$('<div>').text(noteValue).html()}</textarea>
+                                        <div class="note-meta" style="display:flex; justify-content:flex-end; font-size:0.78rem; color:#666; margin-top:4px;"><span class="note-count">${noteValue.length}/200</span></div>
+                                    </div>
+                        </div>`;
+                    $('#box-item-belanja').append(html);
+                });
         }
         hitungTotalNota();
     }
@@ -322,6 +336,8 @@ $(document).ready(function() {
         $('#hidden-customer-name').val($(this).val()); 
         simpanKeLocalStorage(); 
     });
+
+    
 
     // DETEKSI METODE BAYAR CHANGED
     $(document).on('change', 'input[name="payment_method"]', function() {
@@ -349,7 +365,11 @@ $(document).ready(function() {
         var harga = parseInt($(this).data('harga'));
 
         $('.empty-text').remove();
-        var itemEksis = $('#cart-' + id);
+        var itemEksis = $('.cart-item').filter(function() {
+            var productId = $(this).find('input[name="product_id[]"]').val();
+            var noteText = $(this).find('.input-note').val().trim();
+            return productId == id && noteText === '';
+        }).first();
 
         if(itemEksis.length > 0) {
             var inputQty = itemEksis.find('.input-qty');
@@ -357,12 +377,17 @@ $(document).ready(function() {
             inputQty.val(qtyBaru);
             itemEksis.find('.text-qty').text(qtyBaru);
         } else {
+            var rowKey = generateCartRowKey(id);
             var html = `
-                <div class="cart-item" id="cart-${id}" data-harga="${harga}">
+                <div class="cart-item" id="cart-${rowKey}" data-harga="${harga}">
                     <div class="cart-info"><div class="cart-name">${nama}</div><div class="cart-price">Rp ${harga.toLocaleString('id-ID')}</div></div>
                     <div class="cart-qty-controls">
                         <input type="hidden" name="product_id[]" value="${id}"><input type="hidden" name="price[]" value="${harga}"><input type="hidden" name="quantity[]" value="1" class="input-qty">
-                        <button type="button" class="btn-qty btn-min" data-id="${id}">-</button><span class="text-qty">1</span><button type="button" class="btn-qty btn-plus" data-id="${id}">+</button>
+                        <button type="button" class="btn-qty btn-min" data-row-key="${rowKey}">-</button><span class="text-qty">1</span><button type="button" class="btn-qty btn-plus" data-row-key="${rowKey}">+</button>
+                    </div>
+                    <div class="cart-note" style="margin-top:6px;">
+                        <textarea name="notes[]" class="input-note" maxlength="200" placeholder="Catatan (opsional)" style="width:100%; min-height:30px; padding:6px; border:1px solid #e0e0e0; border-radius:6px; font-size:0.9rem; line-height:1.15;"></textarea>
+                        <div class="note-meta" style="display:flex; justify-content:flex-end; font-size:0.78rem; color:#666; margin-top:4px;"><span class="note-count">0/200</span></div>
                     </div>
                 </div>`;
             $('#box-item-belanja').append(html);
@@ -373,13 +398,21 @@ $(document).ready(function() {
 
     // BUTTON PLUS MINUS QTY
     $(document).on('click', '.btn-plus', function() {
-        var id = $(this).data('id'); var item = $('#cart-' + id); var input = item.find('.input-qty');
-        var qty = parseInt(input.val()) + 1; input.val(qty); item.find('.text-qty').text(qty);
+        var rowKey = $(this).data('row-key');
+        var item = $('#cart-' + rowKey);
+        var input = item.find('.input-qty');
+        if (item.length === 0) return;
+        var qty = parseInt(input.val()) + 1;
+        input.val(qty);
+        item.find('.text-qty').text(qty);
         hitungTotalNota(); simpanKeLocalStorage();
     });
 
     $(document).on('click', '.btn-min', function() {
-        var id = $(this).data('id'); var item = $('#cart-' + id); var input = item.find('.input-qty');
+        var rowKey = $(this).data('row-key');
+        var item = $('#cart-' + rowKey);
+        if (item.length === 0) return;
+        var input = item.find('.input-qty');
         var qty = parseInt(input.val()) - 1;
         if(qty <= 0) {
             item.remove();
@@ -387,6 +420,18 @@ $(document).ready(function() {
         } else { input.val(qty); item.find('.text-qty').text(qty); }
         hitungTotalNota(); simpanKeLocalStorage();
     });
+
+    // Per-item note input: update counter and persist
+    $(document).on('input', '.input-note', function() {
+        var val = $(this).val() || '';
+        var max = parseInt($(this).attr('maxlength') || 200, 10);
+        $(this).closest('.cart-note').find('.note-count').text(val.length + '/' + max);
+        simpanKeLocalStorage();
+    });
+
+    
+
+    
 
     // KALKULATOR TOTAL NOTA & KEMBALIAN
     function hitungTotalNota() {
@@ -583,5 +628,6 @@ $(document).ready(function() {
     fetchData();
 });
 </script>
+    
 </body>
 </html>

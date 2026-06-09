@@ -9,7 +9,10 @@ if (isset($_SESSION['user']['id'])) {
         include 'admin/admin_dash.php';
     } else if ($_SESSION['user']['role'] === 'cashier') {
     include 'cashier/kasir_dash.php';
-    } else {
+    } else if ($_SESSION['user']['role'] === 'kitchen') {
+        include 'kitchen/dash_kitchen.php';
+    }
+    else {
         echo "Role tidak dikenali.";
     }
 } else {
