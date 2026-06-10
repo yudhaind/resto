@@ -12,7 +12,9 @@ if (isset($_SESSION['user']['id'])) {
     } else if ($_SESSION['user']['role'] === 'kitchen') {
         include 'kitchen/dash_kitchen.php';
     }
-    else {
+    else if ($_SESSION['user']['role'] === 'waiter') {
+        include 'waiter/dash_waiter.php';
+    } else {
         echo "Role tidak dikenali.";
     }
 } else {
