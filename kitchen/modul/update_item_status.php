@@ -16,7 +16,7 @@ if ($target !== 'kitchen' || !$item_id) {
 
 try {
     // Validasi status value
-    $valid_statuses = ['pending', 'cooking', 'done'];
+    $valid_statuses = ['pending', 'cooking', 'served'];
     if (!in_array($new_status, $valid_statuses)) {
         throw new Exception('Status tidak dikenali.');
     }

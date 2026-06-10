@@ -42,6 +42,7 @@ $password=$rslt['password'];
             <option value="admin" <?php if($role=='admin'){echo ' selected';}  ?>>Admin</option>
             <option value="cashier" <?php if($role=='cashier'){echo ' selected';} ?>>Kasir</option>
             <option value="kitchen" <?php if($role=='kitchen'){echo ' selected';} ?>>Dapur</option>
+            <option value="waiter" <?php if($role=='waiter'){echo ' selected';} ?>>Waiter</option>
         </select>
 
         <label for="is_active">Status Aktif</label>

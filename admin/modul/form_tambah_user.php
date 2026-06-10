@@ -30,6 +30,7 @@ $_SESSION['token'] = $tokenform;
             <option value="admin">Admin</option>
             <option value="cashier">Kasir</option>
             <option value="kitchen">Dapur</option>
+            <option value="waiter">Waiter</option>
         </select>
 
         <label for="is_active">Status Aktif</label>
