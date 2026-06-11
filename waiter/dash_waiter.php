@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Waiter - Manajemen Meja</title>
+    <script src="assets/js/jquery-4.0.0.min.js"></script>
     <style>
         :root {
             --bg-color: #f4f6f9;
@@ -162,7 +163,7 @@
     </header>
 
     <main class="grid-meja">
-
+        <input type="hidden" id="target-sync" value="waitersync">
         <div class="card-meja">
             <div>
                 <div class="header-meja">
@@ -186,7 +187,7 @@
             </div>
             <button class="btn-aksi" onclick="alert('Panggil kasir atau tambah pesanan Meja 01')">Aksi Meja</button>
         </div>
-
+<!--
         <div class="card-meja">
             <div>
                 <div class="header-meja">
@@ -230,8 +231,55 @@
             </div>
             <button class="btn-aksi" onclick="alert('Panggil kasir atau tambah pesanan Meja 07')">Aksi Meja</button>
         </div>
-
+-->
     </main>
+<script>
+    $(document).ready(function() {
+    let nilaiLama = null; 
+    const globaltoken = '<?php echo isset($_SESSION['globaltoken']) ? $_SESSION['globaltoken'] : ''; ?>';
 
+    function fetchData() {
+        const targetSync = $('#target-sync').val();
+        
+        // Dipindahkan ke dalam agar dinamis mengambil nilai input terbaru
+        const dataJson = {
+            ajax: "ajax",
+            target: targetSync,
+        };
+
+        $.ajax({
+            url: 'ajaxserver.php?page=sync',
+            type: 'POST',
+            data: { 
+                globaltoken: globaltoken, 
+                payload: JSON.stringify(dataJson)
+            },
+            dataType: 'json',
+            success: function(respon) {
+                if (respon.status === 'success') {
+                    console.log('Data berhasil diterima:', respon.data);
+                    
+                    // Logika pendeteksi perubahan data
+                    let nilaiBaru = respon.data.target;
+                    if (nilaiLama !== nilaiBaru) {
+                        console.log('Data berubah dari', nilaiLama, 'menjadi', nilaiBaru);
+                        nilaiLama = nilaiBaru;
+                    }
+                } else {
+                    console.error('Error dari server:', respon.message);    
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Koneksi gagal atau ada error PHP:', xhr.responseText);
+            },
+            complete: function() {
+                setTimeout(fetchData, 5000);
+            }
+         });
+     }
+
+    fetchData();
+});
+</script>
 </body>
 </html>

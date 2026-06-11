@@ -10,7 +10,7 @@
             "server": "localhost",
             "port": 3306,
             "driver": "MySQL",
-            "name": "resto",
+            "name": "db_resto",
             "database": "db_resto",
             "username": "adminphp",
             "password": "Adm1nitso"
