@@ -3,283 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Waiter - Manajemen Meja</title>
+    <title>Status Meja Responsif</title>
     <script src="assets/js/jquery-4.0.0.min.js"></script>
     <style>
-        :root {
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --text-muted: #777777;
-            --primary: #4a90e2;
-            
-            /* Status Colors */
-            --status-pending: #ff9800;   /* Menunggu */
-            --status-cooking: #2196f3;   /* Dimasak */
-            --status-served: #4caf50;    /* Disajikan */
+        /* Reset dasar & Font */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* Background Halaman Utama */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
+            background-color: #1a2332;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
 
-        header {
-            margin-bottom: 30px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
+        /* Container Utama (Lebar maksimal diperbesar agar muat 4 kolom di PC) */
+        .container {
+            background-color: #222e43;
+            border: 1px solid #2d3d56;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 800px; /* Diperlebar dari 380px ke 800px */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #2c3e50;
+        /* Bagian Header / Judul */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            color: #94a3b8;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
         }
 
-        header p {
-            margin: 5px 0 0 0;
-            color: var(--text-muted);
+        .icon-chair {
+            font-size: 1.2rem;
         }
 
-        /* Grid Sistem untuk Meja */
+        /* --- TAMPILAN DEFAULT (UNTUK HP) --- */
+        /* Menggunakan 2 Kolom secara default */
         .grid-meja {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
         }
 
-        /* Kartu Meja */
+        /* Kartu Meja (Box) */
         .card-meja {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            background-color: #2c3a50;
+            border-radius: 12px;
             padding: 20px;
-            border-top: 4px solid var(--primary);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .header-meja {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .nomor-meja {
-            font-size: 20px;
+        /* Tulisan Nama Meja */
+        .nama-meja {
+            color: #ffffff;
+            font-size: 1.25rem;
             font-weight: bold;
-            color: #2c3e50;
+            margin-bottom: 12px;
         }
 
-        .jumlah-pelanggan {
-            font-size: 14px;
-            color: var(--text-muted);
-            background: #eef2f7;
-            padding: 4px 8px;
-            border-radius: 12px;
-        }
-
-        /* Daftar Pesanan */
-        .daftar-pesanan {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 20px 0;
-        }
-
-        .item-pesanan {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .item-pesanan:last-child {
-            border-bottom: none;
-        }
-
-        .nama-menu {
-            font-size: 15px;
-        }
-
-        .qty {
-            font-weight: bold;
-            color: var(--primary);
-            margin-right: 5px;
-        }
-
-        /* Badge Status */
+        /* Badge Status Umum */
         .badge {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
+            font-size: 0.75rem;
             font-weight: 600;
-            text-transform: uppercase;
+            padding: 6px 20px;
+            border-radius: 50px;
+            text-align: center;
+            min-width: 70px;
         }
 
-        .badge-pending {
-            background-color: #fff3e0;
-            color: var(--status-pending);
+        /* Status Terisi (Merah) */
+        .badge.terisi {
+            background-color: #4c2729;
+            color: #ef4444;
+            border: 1px solid #7f2d2f;
         }
 
-        .badge-cooking {
-            background-color: #e3f2fd;
-            color: var(--status-cooking);
+        /* Status kosong (Hijau) */
+        .badge.kosong {
+            background-color: #1e3a31;
+            color: #10b981;
+            border: 1px solid #14532d;
         }
 
-        .badge-served {
-            background-color: #e8f5e9;
-            color: var(--status-served);
-        }
-
-        /* Tombol Aksi */
-        .btn-aksi {
-            width: 100%;
-            background-color: var(--primary);
-            color: white;
+        /*tombol update*/
+        .btn-update {
+            margin-top: 12px;
+            padding: 6px 12px;
+            background-color: #3b82f6;
+            color: #ffffff;
             border: none;
-            padding: 10px;
             border-radius: 6px;
-            font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            font-size: 0.75rem;
+            transition: background-color 0.3s ease;
         }
 
-        .btn-aksi:hover {
-            background-color: #357abd;
+        .status-makanan {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* --- TAMPILAN UNTUK PC / LAYAR LEBAR --- */
+        /* Jika lebar layar minimal 600px (ukuran PC/Tablet), grid berubah jadi 4 kolom */
+        @media (min-width: 600px) {
+            .grid-meja {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Dashboard Waiter</h1>
-        <p>Sistem Pemantauan Pesanan & Meja Real-time</p>
-    </header>
-
-    <main class="grid-meja">
-        <input type="hidden" id="target-sync" value="waitersync">
-        <div class="card-meja">
-            <div>
-                <div class="header-meja">
-                    <span class="nomor-meja">Meja 01</span>
-                    <span class="jumlah-pelanggan">👥 2 Orang</span>
-                </div>
-                <ul class="daftar-pesanan">
-                    <li class="item-pesanan">
-                        <span><span class="qty">2x</span> Nasi Goreng Spesial</span>
-                        <span class="badge badge-served">Disajikan</span>
-                    </li>
-                    <li class="item-pesanan">
-                        <span><span class="qty">1x</span> Es Teh Manis</span>
-                        <span class="badge badge-served">Disajikan</span>
-                    </li>
-                    <li class="item-pesanan">
-                        <span><span class="qty">1x</span> Jus Alpukat</span>
-                        <span class="badge badge-cooking">Dimasak</span>
-                    </li>
-                </ul>
-            </div>
-            <button class="btn-aksi" onclick="alert('Panggil kasir atau tambah pesanan Meja 01')">Aksi Meja</button>
-        </div>
-<!--
-        <div class="card-meja">
-            <div>
-                <div class="header-meja">
-                    <span class="nomor-meja">Meja 04</span>
-                    <span class="jumlah-pelanggan">👥 4 Orang</span>
-                </div>
-                <ul class="daftar-pesanan">
-                    <li class="item-pesanan">
-                        <span><span class="qty">1x</span> Mie Goreng Seafood</span>
-                        <span class="badge badge-pending">Menunggu</span>
-                    </li>
-                    <li class="item-pesanan">
-                        <span><span class="qty">1x</span> Ayam Bakar Taliwang</span>
-                        <span class="badge badge-pending">Menunggu</span>
-                    </li>
-                    <li class="item-pesanan">
-                        <span><span class="qty">4x</span> Air Mineral</span>
-                        <span class="badge badge-served">Disajikan</span>
-                    </li>
-                </ul>
-            </div>
-            <button class="btn-aksi" onclick="alert('Panggil kasir atau tambah pesanan Meja 04')">Aksi Meja</button>
+    <div class="container">
+        <div class="header">
+            <span class="icon-chair">🪑</span>
+            <span>STATUS MEJA</span>
         </div>
 
-        <div class="card-meja">
-            <div>
-                <div class="header-meja">
-                    <span class="nomor-meja">Meja 07</span>
-                    <span class="jumlah-pelanggan">👥 3 Orang</span>
-                </div>
-                <ul class="daftar-pesanan">
-                    <li class="item-pesanan">
-                        <span><span class="qty">3x</span> Ramen Shoyu</span>
-                        <span class="badge badge-cooking">Dimasak</span>
-                    </li>
-                    <li class="item-pesanan">
-                        <span><span class="qty">3x</span> Ocha (Cold)</span>
-                        <span class="badge badge-served">Disajikan</span>
-                    </li>
-                </ul>
+        <div class="grid-meja" id="grid-meja">
+            <div class="card-meja">
+                <span class="nama-meja">Meja 1</span>
+                <span class="badge terisi">Terisi</span>
             </div>
-            <button class="btn-aksi" onclick="alert('Panggil kasir atau tambah pesanan Meja 07')">Aksi Meja</button>
+
+            <div class="card-meja">
+                <span class="nama-meja">Meja 2</span>
+                <span class="badge terisi">Terisi</span>
+            </div>
+
+            <div class="card-meja">
+                <span class="nama-meja">Meja 3</span>
+                <span class="badge siap">Siap</span>
+            </div>
+
+            <div class="card-meja">
+                <span class="nama-meja">Meja 4</span>
+                <span class="badge siap">Siap</span>
+            </div>
+
+            <div class="card-meja">
+                <span class="nama-meja">Meja 5</span>
+                <span class="badge siap">Siap</span>
+                <button class="btn-update">Kosongkan</button>
+            </div>
         </div>
--->
-    </main>
+        <div id="status-sync"></div>
+    </div>
+<input type="hidden" id="target-sync" value="table_waiter" disabled>
+
 <script>
-    $(document).ready(function() {
-    let nilaiLama = null; 
-    const globaltoken = '<?php echo isset($_SESSION['globaltoken']) ? $_SESSION['globaltoken'] : ''; ?>';
+function RenderMeja(ResponServer){
+    var data_meja = ResponServer.list_meja; 
+    if (!data_meja) {
+        console.error('Data meja tidak ditemukan dalam respon server.');
+        return;
+    }
+    
+    var gridMeja = $('#grid-meja');
+    gridMeja.empty(); // Bersihkan konten grid
+    
+    data_meja.forEach(function(meja) {
+        var statusClass = meja.status === 'occupied' ? 'terisi' : 'kosong';
+        
+        // 1. Tentukan style display: jika occupied maka '', jika kosong maka 'display: none;'
+        var tombolDisplay = meja.status === 'occupied' ? '' : 'style="display: none;"';
+        
+        // 2. Gunakan CLASS untuk tombol, jangan gunakan ID yang sama berulang kali
+        var cardMeja = `
+            <div class="card-meja">
+                <span class="nama-meja">${meja.nomeja}</span>
+                <span class="badge ${statusClass}">${meja.status === 'occupied' ? 'Terisi' : 'Kosong'}</span>
+                <span class="status-makanan" ${tombolDisplay}>Status Makanan:</span>
+                <button class="btn-update" ${tombolDisplay}>Kosongkan</button>
+            </div>
+        `;
+        
+        gridMeja.append(cardMeja);
+    });
+}
+
+ $(document).ready(function() {
+    // 1. Inisialisasi token dan target
+    const globaltoken = '<?php echo $_SESSION['globaltoken']; ?>';
+    const targetSync = $('#target-sync').val();
 
     function fetchData() {
-        const targetSync = $('#target-sync').val();
-        
-        // Dipindahkan ke dalam agar dinamis mengambil nilai input terbaru
-        const dataJson = {
-            ajax: "ajax",
-            target: targetSync,
-        };
-
         $.ajax({
             url: 'ajaxserver.php?page=sync',
             type: 'POST',
-            data: { 
-                globaltoken: globaltoken, 
-                payload: JSON.stringify(dataJson)
+            data: {
+                ajax: 'ajax',
+                globaltoken: globaltoken,
+                target: targetSync
             },
             dataType: 'json',
             success: function(respon) {
                 if (respon.status === 'success') {
-                    console.log('Data berhasil diterima:', respon.data);
-                    
-                    // Logika pendeteksi perubahan data
-                    let nilaiBaru = respon.data.target;
-                    if (nilaiLama !== nilaiBaru) {
-                        console.log('Data berubah dari', nilaiLama, 'menjadi', nilaiBaru);
-                        nilaiLama = nilaiBaru;
-                    }
-                } else {
-                    console.error('Error dari server:', respon.message);    
+                    // 2. Cek apakah nilai baru berbeda dengan nilai lama
+                    console.log('Data berhasil diambil:', respon);
+                    $('#status-sync').text('Total Meja: ' + respon.total_meja); // Menampilkan data untuk debugging
+                    RenderMeja(respon);
+                    // Tempatkan logika perbandingan nilai Anda di sini
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Koneksi gagal atau ada error PHP:', xhr.responseText);
+            // Check if the response was empty
+            if (xhr.responseText === "") {
+                console.error('Error: Server returned an empty response.');
+                } else {
+                console.error('Koneksi gagal atau file tidak ditemukan:', error);
+                }
             },
             complete: function() {
+                // 3. Polling setiap 5 detik setelah request selesai
                 setTimeout(fetchData, 5000);
             }
-         });
-     }
+        }); // <-- Penutup $.ajax yang benar
+    } // <-- Penutup fungsi fetchData() yang benar
 
+    // Pemicu pertama kali saat halaman siap
     fetchData();
 });
-</script>
+</script>       
 </body>
 </html>

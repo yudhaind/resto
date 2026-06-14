@@ -1,66 +1,57 @@
 <?php
-require_once 'database.php'; // Pastikan path ini benar sesuai struktur proyek Anda
-
-// 1. Atur header JSON
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *"); 
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
-
-$method = $_SERVER['REQUEST_METHOD'];
-$response = [];
-
-// 2. Logika penanganan request
-if ($method === 'POST') {
-    
-    // Ambil token secara raw
-    $globaltoken = isset($_POST['globaltoken']) ? htmlspecialchars($_POST['globaltoken']) : '';
-    
-    // Ambil payload stringify JSON
-    $payload_raw = isset($_POST['payload']) ? $_POST['payload'] : '{}';
-    $data_json = json_decode($payload_raw, true); // Diubah menjadi array asosiatif PHP
-
-    // Ekstrak data dari dalam JSON secara aman
-    $ajax = isset($data_json['ajax']) ? htmlspecialchars($data_json['ajax']) : '';
-    $target = isset($data_json['target']) ? htmlspecialchars($data_json['target']) : '';
-
-    // 3. Validasi apakah data yang diperlukan ada di dalam JSON
-    if (!empty($ajax) && !empty($target)) {
-        
-        // --- TEMPAT LOGIKA BISNIS ATAU QUERY DATABASE ANDA ---
-        // Contoh: $db->query("...");
-        
-        // Susun respons sukses
-        http_response_code(200);
-        $response = [
-            "status" => "success",
-            "message" => "Data berhasil diterima oleh server",
-            "data" => [
-                "ajax" => $ajax,
-                "target" => $target,
-                "token_terdeteksi" => $globaltoken
-            ]
-        ];
-
-    } else {
-        // Susun respons jika data di dalam payload JSON kosong/tidak lengkap
-        http_response_code(400); 
-        $response = [
-            "status" => "error",
-            "message" => "Data JSON tidak lengkap. 'ajax' dan 'target' wajib ada di dalam payload.",
-            "debug_input" => $data_json
-        ];
+header('Content-Type: application/json');
+header('Cache-Control: no-cache, must-revalidate');
+require_once 'database.php';
+$target = isset($_POST['target']) ? $_POST['target'] : '';
+if ($target === 'table_waiter') {
+    // Contoh query untuk mendapatkan data meja untuk waiter    
+    $sql_count = "SELECT COUNT(*) as total_meja FROM `tables`";
+    $sql_detail = "SELECT * FROM `tables`";
+    $data_detail = fetchAll($sql_detail);
+    $list_meja = array();
+    foreach ($data_detail as $row) {
+        $list_meja[] = array(
+            'id' => $row['id'],
+            'nomeja' => $row['table_number'],
+            'kapasitas' => $row['capacity'],
+            'status' => $row['status'],
+            'status_makanan' => 'Isi status masakan', // Asumsikan ada kolom status_makanan di tabel
+        );
     }
-
+    $data_count = fetchOne($sql_count);   
+    echo json_encode([
+        'status' => 'success',
+        'total_meja' => $data_count['total_meja'], // Mengirimkan jumlah total meja sebagai data
+        'list_meja' => $list_meja // Mengirimkan detail meja sebagai data
+    ]);
 } else {
-    // Jika metode HTTP bukan POST
-    http_response_code(405); 
-    $response = [
-        "status" => "error",
-        "message" => "Metode HTTP tidak diizinkan."
-    ];
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Target tidak dikenali.'
+    ]);
 }
 
-// 4. Cetak output akhir dalam format JSON murni
-echo json_encode($response);
-exit();
+/*
+Join untuk mendapatkan data meja dengan status makanan yang masih pending:
+SELECT 
+    t.table_number AS `Nomor Meja`,
+    o.customer_name AS `Nama Pelanggan`,
+    p.name AS `Nama Produk`,
+    od.quantity AS `Jumlah`,
+    od.price_at_order AS `Harga`,
+    (od.quantity * od.price_at_order) AS `Subtotal`,
+    o.order_status AS `Status Order` -- Menampilkan status untuk memastikan
+FROM 
+    tables t
+INNER JOIN 
+    orders o ON t.id = o.table_id
+INNER JOIN 
+    order_details od ON o.id = od.order_id
+INNER JOIN 
+    products p ON od.product_id = p.id 
+WHERE 
+    t.id = 1                          -- Filter ID Meja
+    AND o.id = 4                     -- Filter ID Order (Ganti angka 10 sesuai kebutuhan)
+    AND od.cooking_status = 'pending';
+*/
 ?>

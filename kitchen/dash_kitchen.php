@@ -254,8 +254,9 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'kitchen') {
             <p>Memantau pesanan masuk secara Real-Time (Sistem Per Item)</p>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
-            <span class="badge-online">● KDS Aktif</span>
+            <span class="badge-online">● <?= isset($_SESSION['user']['name']) ? $_SESSION['user']['name'] : 'Unknown User' ?></span>
             <span id="sync-indicator" style="font-size:13px;color:#94a3b8;">Memuat...</span>
+            <button><a href="logout.php" style="color:#ef4444; font-weight:700; text-decoration:none;">Logout</a></button>
         </div>
     </header>
 
