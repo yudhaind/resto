@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Waktu pembuatan: 05 Jun 2026 pada 09.04
--- Versi server: 8.4.9-0ubuntu0.26.04.1
--- Versi PHP: 8.5.4
+-- Generation Time: Jun 15, 2026 at 08:34 PM
+-- Server version: 8.4.9-0ubuntu0.26.04.1
+-- PHP Version: 8.5.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Basis data: `db_resto`
+-- Database: `db_resto`
 --
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `global_settings`
+-- Table structure for table `global_settings`
 --
 
 CREATE TABLE `global_settings` (
@@ -34,16 +34,16 @@ CREATE TABLE `global_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data untuk tabel `global_settings`
+-- Dumping data for table `global_settings`
 --
 
 INSERT INTO `global_settings` (`id`, `label`, `value`) VALUES
-(1, 'nama_toko', 'Resto Mantab Jaya');
+(1, 'nama_toko', 'Restoran Enak');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `orders`
+-- Table structure for table `orders`
 --
 
 CREATE TABLE `orders` (
@@ -57,10 +57,20 @@ CREATE TABLE `orders` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `table_id`, `waiter_id`, `customer_name`, `total_amount`, `order_status`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'Yudha', 48000.00, 'completed', '2026-06-07 08:01:16', '2026-06-07 08:01:16'),
+(2, 2, 1, 'Faras', 81000.00, 'completed', '2026-06-07 08:06:09', '2026-06-07 08:06:09'),
+(3, 1, 1, '', 33000.00, 'completed', '2026-06-14 05:41:29', '2026-06-14 05:41:29'),
+(4, 1, 1, '', 86000.00, 'completed', '2026-06-14 08:48:17', '2026-06-14 08:48:17');
+
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `order_details`
+-- Table structure for table `order_details`
 --
 
 CREATE TABLE `order_details` (
@@ -74,10 +84,28 @@ CREATE TABLE `order_details` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `order_details`
+--
+
+INSERT INTO `order_details` (`id`, `order_id`, `product_id`, `quantity`, `price_at_order`, `notes`, `cooking_status`, `created_at`) VALUES
+(1, 1, 1, 1, 25000.00, NULL, 'served', '2026-06-07 08:01:16'),
+(2, 1, 2, 1, 8000.00, NULL, 'served', '2026-06-07 08:01:16'),
+(3, 1, 3, 1, 15000.00, NULL, 'served', '2026-06-07 08:01:16'),
+(4, 2, 1, 2, 25000.00, NULL, 'served', '2026-06-07 08:06:09'),
+(5, 2, 2, 2, 8000.00, NULL, 'served', '2026-06-07 08:06:09'),
+(6, 2, 3, 1, 15000.00, NULL, 'served', '2026-06-07 08:06:09'),
+(7, 3, 1, 1, 25000.00, '', 'served', '2026-06-14 05:41:29'),
+(8, 3, 2, 1, 8000.00, '', 'served', '2026-06-14 05:41:29'),
+(9, 4, 1, 2, 25000.00, '', 'pending', '2026-06-14 08:48:17'),
+(10, 4, 2, 2, 8000.00, '', 'pending', '2026-06-14 08:48:17'),
+(11, 4, 3, 1, 15000.00, '', 'pending', '2026-06-14 08:48:17'),
+(12, 4, 4, 1, 5000.00, '', 'pending', '2026-06-14 08:48:17');
+
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `payments`
+-- Table structure for table `payments`
 --
 
 CREATE TABLE `payments` (
@@ -90,10 +118,20 @@ CREATE TABLE `payments` (
   `paid_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`id`, `order_id`, `cashier_id`, `payment_method`, `amount_paid`, `change_amount`, `paid_at`) VALUES
+(1, 1, 1, 'cash', 100000.00, 52000.00, '2026-06-07 08:01:16'),
+(2, 2, 1, 'cash', 100000.00, 19000.00, '2026-06-07 08:06:09'),
+(3, 3, 1, 'cash', 50000.00, 17000.00, '2026-06-14 05:41:29'),
+(4, 4, 1, 'cash', 100000.00, 14000.00, '2026-06-14 08:48:17');
+
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `products`
+-- Table structure for table `products`
 --
 
 CREATE TABLE `products` (
@@ -108,19 +146,19 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data untuk tabel `products`
+-- Dumping data for table `products`
 --
 
 INSERT INTO `products` (`id`, `name`, `category`, `price`, `is_available`, `created_at`, `updated_at`, `images`) VALUES
-(1, 'Nasi Goreng', 'food', 25000.00, 1, '2026-06-04 06:38:17', '2026-06-04 06:38:17', ''),
-(2, 'Es Jeruk', 'drink', 8000.00, 1, '2026-06-04 06:38:41', '2026-06-04 06:38:41', ''),
-(3, 'Kentang Goreng', 'snack', 15000.00, 1, '2026-06-04 06:39:00', '2026-06-04 06:39:00', ''),
-(4, 'Puding', 'dessert', 10000.00, 1, '2026-06-04 06:39:17', '2026-06-04 06:39:17', '');
+(1, 'Nasi Goreng', 'food', 25000.00, 1, '2026-06-05 21:48:07', '2026-06-05 21:48:07', ''),
+(2, 'Es Jeruk', 'drink', 8000.00, 1, '2026-06-05 21:48:24', '2026-06-05 21:48:24', ''),
+(3, 'Kentang Goreng', 'snack', 15000.00, 1, '2026-06-05 21:48:41', '2026-06-05 21:48:41', ''),
+(4, 'Puding', 'dessert', 5000.00, 1, '2026-06-05 21:49:04', '2026-06-05 21:49:04', '');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tables`
+-- Table structure for table `tables`
 --
 
 CREATE TABLE `tables` (
@@ -133,20 +171,21 @@ CREATE TABLE `tables` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data untuk tabel `tables`
+-- Dumping data for table `tables`
 --
 
 INSERT INTO `tables` (`id`, `table_number`, `capacity`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Meja 1', 2, 'available', '2026-06-04 06:32:30', '2026-06-04 06:36:41'),
-(2, 'Meja 2', 2, 'available', '2026-06-04 06:32:40', '2026-06-04 06:36:42'),
-(3, 'Meja 3', 4, 'available', '2026-06-04 06:34:51', '2026-06-04 06:36:43'),
-(4, 'Meja 4', 4, 'available', '2026-06-04 06:37:06', '2026-06-04 06:37:06'),
-(5, 'Meje 5', 4, 'available', '2026-06-04 06:37:40', '2026-06-04 06:37:40');
+(1, 'Meja 1', 2, 'occupied', '2026-06-05 21:49:24', '2026-06-14 08:48:17'),
+(2, 'Meja 2', 2, 'available', '2026-06-05 21:49:33', '2026-06-14 05:40:10'),
+(3, 'Meja 3', 2, 'available', '2026-06-05 21:49:43', '2026-06-14 05:39:40'),
+(4, 'Meja 4', 2, 'available', '2026-06-05 21:49:52', '2026-06-14 05:39:39'),
+(5, 'Meja 5', 4, 'available', '2026-06-05 21:50:09', '2026-06-14 05:39:39'),
+(6, 'Meja 6', 4, 'available', '2026-06-14 05:36:22', '2026-06-14 05:39:37');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -161,25 +200,27 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 --
--- Dumping data untuk tabel `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `name`, `role`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2y$10$zIfiyx70sE3P0teNv6BFIOOp2B.MOD5vG4dJzB2ygWvr7.UvXW7Vm', 'Yudha Indharmawan', 'admin', 1, '2026-05-21 06:34:20', '2026-06-05 08:40:38'),
-(2, 'kasir', '$2y$12$RkuaZbMpSWLQmZfokmi7me6GHIFPL0edWga0/ynnpmYJDuZm/dbzG', 'Nama Kasir', 'cashier', 1, '2026-06-04 06:34:16', '2026-06-04 06:34:16');
+(1, 'admin', '$2y$10$zIfiyx70sE3P0teNv6BFIOOp2B.MOD5vG4dJzB2ygWvr7.UvXW7Vm', 'Admin', 'admin', 1, '2026-05-21 06:34:20', '2026-05-21 06:34:20'),
+(2, 'kasir', '$2y$12$kA2e8MPWaFI.OdqhTHQsheLL6pdMVDzu0Gb6YXnYPzwG1uGcXeFt6', 'Nama Kasir', 'cashier', 1, '2026-06-06 13:34:04', '2026-06-06 13:35:20'),
+(3, 'dapur', '$2y$12$acQq3jN3kRwzruxKtn.jmOF9kMHYGFSSrMJV/KNB05BVAt.LK1hZS', 'Nama Dapur', 'kitchen', 1, '2026-06-13 21:54:08', '2026-06-13 21:54:08'),
+(4, 'pelayan', '$2y$12$iMwnhwjhIQHfyqmFzl.8Q.cmXkoJHlF5XZMIsMyQAUY2GusCVQwBy', 'Nama Pelayan', 'waiter', 1, '2026-06-13 21:54:44', '2026-06-13 21:54:44');
 
 --
--- Indeks untuk tabel yang dibuang
+-- Indexes for dumped tables
 --
 
 --
--- Indeks untuk tabel `global_settings`
+-- Indexes for table `global_settings`
 --
 ALTER TABLE `global_settings`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `orders`
+-- Indexes for table `orders`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`),
@@ -187,7 +228,7 @@ ALTER TABLE `orders`
   ADD KEY `fk_orders_waiter` (`waiter_id`);
 
 --
--- Indeks untuk tabel `order_details`
+-- Indexes for table `order_details`
 --
 ALTER TABLE `order_details`
   ADD PRIMARY KEY (`id`),
@@ -195,7 +236,7 @@ ALTER TABLE `order_details`
   ADD KEY `fk_details_product` (`product_id`);
 
 --
--- Indeks untuk tabel `payments`
+-- Indexes for table `payments`
 --
 ALTER TABLE `payments`
   ADD PRIMARY KEY (`id`),
@@ -203,91 +244,91 @@ ALTER TABLE `payments`
   ADD KEY `fk_payments_cashier` (`cashier_id`);
 
 --
--- Indeks untuk tabel `products`
+-- Indexes for table `products`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `tables`
+-- Indexes for table `tables`
 --
 ALTER TABLE `tables`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `table_number` (`table_number`);
 
 --
--- Indeks untuk tabel `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `global_settings`
+-- AUTO_INCREMENT for table `global_settings`
 --
 ALTER TABLE `global_settings`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT untuk tabel `orders`
+-- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT untuk tabel `order_details`
+-- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT untuk tabel `payments`
+-- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT untuk tabel `products`
+-- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `tables`
+--
+ALTER TABLE `tables`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT untuk tabel `tables`
---
-ALTER TABLE `tables`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT untuk tabel `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+-- Constraints for dumped tables
 --
 
 --
--- Ketidakleluasaan untuk tabel `orders`
+-- Constraints for table `orders`
 --
 ALTER TABLE `orders`
   ADD CONSTRAINT `fk_orders_table` FOREIGN KEY (`table_id`) REFERENCES `tables` (`id`) ON DELETE RESTRICT,
   ADD CONSTRAINT `fk_orders_waiter` FOREIGN KEY (`waiter_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT;
 
 --
--- Ketidakleluasaan untuk tabel `order_details`
+-- Constraints for table `order_details`
 --
 ALTER TABLE `order_details`
   ADD CONSTRAINT `fk_details_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_details_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT;
 
 --
--- Ketidakleluasaan untuk tabel `payments`
+-- Constraints for table `payments`
 --
 ALTER TABLE `payments`
   ADD CONSTRAINT `fk_payments_cashier` FOREIGN KEY (`cashier_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
