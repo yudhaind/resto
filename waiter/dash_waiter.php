@@ -193,7 +193,7 @@ function RenderMeja(ResponServer){
             <div class="card-meja">
                 <span class="nama-meja">${meja.nomeja}</span>
                 <span class="badge ${statusClass}">${meja.status === 'occupied' ? 'Terisi' : 'Kosong'}</span>
-                <span class="status-makanan" ${tombolDisplay}>Status Makanan:</span>
+                <span class="status-makanan" ${tombolDisplay}>Status Makanan: ${meja.status_makanan}</span>
                 <button class="btn-update" ${tombolDisplay}>Kosongkan</button>
             </div>
         `;

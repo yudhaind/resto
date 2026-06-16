@@ -3,9 +3,15 @@ header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 require_once 'database.php';
 $target = isset($_POST['target']) ? $_POST['target'] : '';
-if ($target === 'table_waiter') {
+if ($target != 'table_waiter') { 
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Target tidak valid.'
+    ]);
+    exit;
+}
     // Contoh query untuk mendapatkan data meja untuk waiter    
-    $sql_count = "SELECT COUNT(*) as total_meja FROM `tables`";
+   /* $sql_count = "SELECT COUNT(*) as total_meja FROM `tables`";
     $sql_detail = "SELECT * FROM `tables`";
     $data_detail = fetchAll($sql_detail);
     $list_meja = array();
@@ -31,7 +37,7 @@ if ($target === 'table_waiter') {
     ]);
 }
 
-/*
+
 Join untuk mendapatkan data meja dengan status makanan yang masih pending:
 SELECT 
     t.table_number AS `Nomor Meja`,
