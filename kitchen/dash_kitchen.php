@@ -456,7 +456,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'kitchen') {
                 complete: function() {
                     // LOGIKA REAL-TIME POLLING: Jalankan ulang fungsi fetchData ini secara terus-menerus setiap 5 detik (5000 milidetik)
                     if (document.getElementById('grid-order')) {
-                        setTimeout(fetchData, 5000);
+                        setTimeout(fetchData, 8000);
                     }
                 },
                 error: function(xhr, status, err) {
