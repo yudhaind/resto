@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Status Meja Responsif</title>
     <script src="assets/js/jquery-4.0.0.min.js"></script>
+    <script src="assets/js/main.js"></script>
     <style>
         /* Reset dasar & Font */
         * {
@@ -36,22 +37,68 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
         }
 
-        /* Bagian Header / Judul */
+        /* Bagian Header / Judul (Sekarang Flexbox 1 Baris) */
         .header {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between; /* Membuat judul di kiri, waiter & logout di kanan */
+            flex-wrap: wrap; /* Agar aman di layar handphone kecil */
+            gap: 16px;
             margin-bottom: 24px;
-            color: #94a3b8;
-            font-weight: 700;
-            font-size: 1.25rem;
-            letter-spacing: 0.5px;
             border-bottom: 1px solid #334155;
             padding-bottom: 16px;
         }
 
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+        }
+
         .icon-chair {
             font-size: 1.5rem;
+        }
+
+        /* Bagian Kanan Header (Waiter Info & Logout) */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .info-waiter {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nama-waiter-text {
+            font-weight: 600;
+            color: #34d399; /* Warna hijau penanda aktif */
+        }
+
+        .btn-logout {
+            padding: 6px 14px;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
         }
 
         /* --- TAMPILAN FLUID GRID (OTOMATIS RESPONSIF) --- */
@@ -169,11 +216,23 @@
     </style>
 </head>
 <body>
-
+<input type="hidden" name="globaltoken" id="globaltoken" value="<?= $_SESSION['globaltoken'];?>">
     <div class="container">
         <div class="header">
-            <span class="icon-chair">🪑</span>
-            <span>STATUS MEJA</span>
+            <div class="header-title">
+                <span class="icon-chair">🪑</span>
+                <span>STATUS MEJA</span>
+            </div>
+            
+            <div class="header-actions">
+                <div class="info-waiter">
+                    <span>👤 Waiter:</span>
+                    <span class="nama-waiter-text"><?= $_SESSION['nama_waiter'] ?? 'Tidak Diketahui'; ?></span>
+                </div>
+                <button class="btn-logout" onclick="if(confirm('Apakah Anda yakin ingin keluar?')) { window.location.href='logout.php'; }">
+                    Logout 🚪
+                </button>
+            </div>
         </div>
 
         <div class="grid-meja" id="grid-meja">
@@ -230,7 +289,6 @@ function RenderHalaman(ResponServer) {
                     c_stat = "yellow";
                 }
               
-                
                 return `${item.name} (${item.quantity}x)   <span style="display: inline-block; border: thin solid; width: 10px; height: 10px; background-color: ${c_stat};"></span>`;
             }).join('<br> ');
             
@@ -251,7 +309,7 @@ function RenderHalaman(ResponServer) {
                     <span class="badge ${statusClass}">${statusText}</span>
                     ${infoMakanan}
                 </div>
-                ${isOccupied ? `<button class="btn-update">Kosongkan</button>` : ''}
+                ${isOccupied ? ((meja.pending_count==0 && meja.cooking_count==0 ) ? `<button class="btn-update" onclick="route('kosong&id=${meja.id}','loader','0','false');">Kosongkan</button><span id="loader"></span>`: '') : ''}
             </div>
         `;
         
