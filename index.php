@@ -11,8 +11,7 @@ if (isset($_SESSION['user']['id'])) {
     include 'cashier/kasir_dash.php';
     } else if ($_SESSION['user']['role'] === 'kitchen') {
         include 'kitchen/dash_kitchen.php';
-    }
-    else if ($_SESSION['user']['role'] === 'waiter') {
+    } else if ($_SESSION['user']['role'] === 'waiter') {
         include 'waiter/dash_waiter.php';
     } else {
         echo "Role tidak dikenali.";

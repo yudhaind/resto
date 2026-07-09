@@ -83,6 +83,33 @@
             color: #34d399; /* Warna hijau penanda aktif */
         }
 
+        /* --- INDIKATOR SYNC LINGKARAN --- */
+        .sync-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .sync-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .sync-indicator.online {
+            background-color: #10b981; /* Hijau */
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .sync-indicator.offline {
+            background-color: #ef4444; /* Merah */
+            box-shadow: 0 0 8px #ef4444;
+        }
+
         .btn-logout {
             padding: 6px 14px;
             background-color: rgba(239, 68, 68, 0.1);
@@ -222,6 +249,10 @@
             <div class="header-title">
                 <span class="icon-chair">🪑</span>
                 <span>STATUS MEJA</span>
+                <div class="sync-container">
+                    <span id="sync-dot" class="sync-indicator offline"></span>
+                    <span id="sync-text">Menghubungkan...</span>
+                </div>
             </div>
             
             <div class="header-actions">
@@ -338,10 +369,22 @@ $(document).ready(function() {
                     
                     // Panggil fungsi render tunggal dengan membawa objek 'respon' utuh
                     RenderHalaman(respon); 
+
+                    // Update Indikator ke HIJAU (Berhasil)
+                    $('#sync-dot').removeClass('offline').addClass('online');
+                    $('#sync-text').text('Terhubung').css('color', '#34d399');
+                } else {
+                    // Kasus jika server merespon tetapi mengembalikan status 'error/failed'
+                    $('#sync-dot').removeClass('online').addClass('offline');
+                    $('#sync-text').text('Sync Gagal (Data Error)').css('color', '#f87171');
                 }
             },
             error: function(xhr, status, error) {
                 console.error('Koneksi atau parsing data gagal:', error);
+                
+                // Update Indikator ke MERAH (Gagal / Putus Koneksi)
+                $('#sync-dot').removeClass('online').addClass('offline');
+                $('#sync-text').text('Koneksi Terputus').css('color', '#f87171');
             },
             complete: function() {
                 setTimeout(fetchData, 5000);

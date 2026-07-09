@@ -12,6 +12,13 @@ $enum_mentah = $h_enum['COLUMN_TYPE'];
 $cleaned = substr($enum_mentah, 5, -1);
 $cleaned = str_replace("'", "", $cleaned);
 $enum_array = explode(",", $cleaned);
+
+$sqlnt="SELECT value FROM `global_settings` WHERE `id` = 1";
+$hnt=fetchOne($sqlnt);
+
+$sqlat="SELECT value FROM `global_settings` WHERE `id` = 2";
+$hat=fetchOne($sqlat);
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -21,14 +28,58 @@ $enum_array = explode(",", $cleaned);
     <title>Sistem Kasir Modern - Flexible Payment & Compact</title>
     <link rel="stylesheet" href="assets/css/kasirstyle.css">
     <script src="assets/js/jquery-4.0.0.min.js"></script>
+    <style>
+        /* CSS Tambahan untuk Indikator Sync */
+        .topbar-sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sync-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Status Online (Hijau) */
+        .sync-dot.online {
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        /* Status Offline (Merah) */
+        .sync-dot.offline {
+            background-color: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+
+        #sync-text {
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+    </style>
 </head>
 <body>
 
 <header class="topbar">
     <div class="topbar-store-info">
-        <span class="topbar-brand">Nama Toko Anda</span>
-        <span class="topbar-address">Jl. Raya Pusat No. 123, Kota Anda</span>
+        <span class="topbar-brand"><?= $hnt['value'];?></span>
+        <span class="topbar-address"><?= $hat['value'];?></span>
     </div>
+    
+    <div class="topbar-sync-status">
+        <span id="sync-dot" class="sync-dot offline"></span>
+        <span id="sync-text" style="color: #ef4444;">Offline</span>
+    </div>
+
     <div class="topbar-user-zone">
         <div class="topbar-user-info">
             <span>Kasir: <strong><?= isset($_SESSION['user']['name']) ? htmlspecialchars($_SESSION['user']['name']) : 'Kasir'; ?></strong></span>
@@ -116,8 +167,6 @@ $enum_array = explode(",", $cleaned);
                     <p class="empty-text">Keranjang masih kosong</p>
                 </div>
 
-                <!-- Catatan sekarang per-item; global textarea removed -->
-
                 <div class="form-group" style="margin-top: 14px;">
                     <label>Metode Pembayaran</label>
                     <div class="option-container" id="payment-options-wrapper"></div>
@@ -184,7 +233,6 @@ $(document).ready(function() {
             `;
             wrapper.append(htmlButton);
         });
-        // Set default value ke input hidden
         $('#hidden-payment-method').val($('input[name="payment_method"]:checked').val());
     }
     renderMetodePembayaran();
@@ -193,7 +241,6 @@ $(document).ready(function() {
         return productId + '-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
     }
 
-    // FILTER KATEGORI PRODUK VIA JQUERY
     $('.btn-category').on('click', function() {
         $('.btn-category').removeClass('active');
         $(this).addClass('active');
@@ -208,7 +255,6 @@ $(document).ready(function() {
         }
     });
 
-    // MODAL EVENTS
     $('#trigger-modal-meja').on('click', function() {
         $('#modal-meja-overlay').css('display', 'flex').hide().fadeIn(150);
     });
@@ -217,7 +263,6 @@ $(document).ready(function() {
         if (e.target === this) { $('#modal-meja-overlay').fadeOut(150); }
     });
 
-    // PROSES PILIH MEJA
     $(document).on('click', '.meja-box', function() {
         $('.meja-box').removeClass('selected');
         $(this).addClass('selected');
@@ -246,7 +291,6 @@ $(document).ready(function() {
         kalkulatorKembalian();
     });
 
-    // SIMPAN DATA KE LOCAL STORAGE
     function simpanKeLocalStorage() {
         var keranjang = [];
         $('.cart-item').each(function() {
@@ -276,7 +320,6 @@ $(document).ready(function() {
         localStorage.setItem('kasir_terpadu_data', JSON.stringify(dataKasir));
     }
 
-    // LOAD DATA DARI LOCAL STORAGE
     function muatDariLocalStorage() {
         var dataLokal = localStorage.getItem('kasir_terpadu_data');
         if (!dataLokal) return;
@@ -310,36 +353,32 @@ $(document).ready(function() {
 
         if (data.itemBelanja && data.itemBelanja.length > 0) {
             $('.empty-text').remove();
-                    data.itemBelanja.forEach(function(item) {
-                    var noteValue = item.note ? item.note : '';
-                    var rowKey = item.rowKey || generateCartRowKey(item.productId);
-                    var html = `
-                        <div class="cart-item" id="cart-${rowKey}" data-harga="${item.harga}">
-                            <div class="cart-info"><div class="cart-name">${item.nama}</div><div class="cart-price">Rp ${item.harga.toLocaleString('id-ID')}</div></div>
-                            <div class="cart-qty-controls">
-                                <input type="hidden" name="product_id[]" value="${item.productId}"><input type="hidden" name="price[]" value="${item.harga}"><input type="hidden" name="quantity[]" value="${item.qty}" class="input-qty">
-                                <button type="button" class="btn-qty btn-min" data-row-key="${rowKey}">-</button><span class="text-qty">${item.qty}</span><button type="button" class="btn-qty btn-plus" data-row-key="${rowKey}">+</button>
-                            </div>
-                                    <div class="cart-note" style="margin-top:6px;">
-                                        <textarea name="notes[]" class="input-note" maxlength="200" placeholder="Catatan (opsional)" style="width:100%; min-height:30px; padding:6px; border:1px solid #e0e0e0; border-radius:6px; font-size:0.9rem; line-height:1.15;">${$('<div>').text(noteValue).html()}</textarea>
-                                        <div class="note-meta" style="display:flex; justify-content:flex-end; font-size:0.78rem; color:#666; margin-top:4px;"><span class="note-count">${noteValue.length}/200</span></div>
-                                    </div>
-                        </div>`;
-                    $('#box-item-belanja').append(html);
-                });
+                data.itemBelanja.forEach(function(item) {
+                var noteValue = item.note ? item.note : '';
+                var rowKey = item.rowKey || generateCartRowKey(item.productId);
+                var html = `
+                    <div class="cart-item" id="cart-${rowKey}" data-harga="${item.harga}">
+                        <div class="cart-info"><div class="cart-name">${item.nama}</div><div class="cart-price">Rp ${item.harga.toLocaleString('id-ID')}</div></div>
+                        <div class="cart-qty-controls">
+                            <input type="hidden" name="product_id[]" value="${item.productId}"><input type="hidden" name="price[]" value="${item.harga}"><input type="hidden" name="quantity[]" value="${item.qty}" class="input-qty">
+                            <button type="button" class="btn-qty btn-min" data-row-key="${rowKey}">-</button><span class="text-qty">${item.qty}</span><button type="button" class="btn-qty btn-plus" data-row-key="${rowKey}">+</button>
+                        </div>
+                        <div class="cart-note" style="margin-top:6px;">
+                            <textarea name="notes[]" class="input-note" maxlength="200" placeholder="Catatan (opsional)" style="width:100%; min-height:30px; padding:6px; border:1px solid #e0e0e0; border-radius:6px; font-size:0.9rem; line-height:1.15;">${$('<div>').text(noteValue).html()}</textarea>
+                            <div class="note-meta" style="display:flex; justify-content:flex-end; font-size:0.78rem; color:#666; margin-top:4px;"><span class="note-count">${noteValue.length}/200</span></div>
+                        </div>
+                    </div>`;
+                $('#box-item-belanja').append(html);
+            });
         }
         hitungTotalNota();
     }
 
-    // LIVE SYNC NAMA PELANGGAN
     $('#input-nama').on('input', function() { 
         $('#hidden-customer-name').val($(this).val()); 
         simpanKeLocalStorage(); 
     });
 
-    
-
-    // DETEKSI METODE BAYAR CHANGED
     $(document).on('change', 'input[name="payment_method"]', function() {
         var tipe = $(this).val();
         $('#hidden-payment-method').val(tipe);
@@ -352,7 +391,6 @@ $(document).ready(function() {
         simpanKeLocalStorage();
     });
 
-    // TAMBAH KE KERANJANG
     $('.product-button').on('click', function() {
         var idMejaTerpilih = $('#hidden-table-id').val();
         if(!idMejaTerpilih) {
@@ -396,7 +434,6 @@ $(document).ready(function() {
         simpanKeLocalStorage();
     });
 
-    // BUTTON PLUS MINUS QTY
     $(document).on('click', '.btn-plus', function() {
         var rowKey = $(this).data('row-key');
         var item = $('#cart-' + rowKey);
@@ -421,7 +458,6 @@ $(document).ready(function() {
         hitungTotalNota(); simpanKeLocalStorage();
     });
 
-    // Per-item note input: update counter and persist
     $(document).on('input', '.input-note', function() {
         var val = $(this).val() || '';
         var max = parseInt($(this).attr('maxlength') || 200, 10);
@@ -429,11 +465,6 @@ $(document).ready(function() {
         simpanKeLocalStorage();
     });
 
-    
-
-    
-
-    // KALKULATOR TOTAL NOTA & KEMBALIAN
     function hitungTotalNota() {
         var total = 0;
         $('.cart-item').each(function() { total += (parseInt($(this).data('harga')) * parseInt($(this).find('.input-qty').val())); });
@@ -522,7 +553,6 @@ $(document).ready(function() {
     
     muatDariLocalStorage();
 
-    // SUBMIT FORM KASIR (AJAX)
     $('#form-kasir').on('submit', function(e) {
         e.preventDefault();
         var dataSerialize = $(this).serialize();
@@ -533,7 +563,6 @@ $(document).ready(function() {
                     alert('Transaksi Berhasil Diproses!');
                     localStorage.removeItem('kasir_terpadu_data');
                     
-                    // Reset Form DOM secara bersih
                     $('#form-kasir')[0].reset();
                     $('#input-nama').val('');
                     $('#hidden-customer-name').val('');
@@ -559,7 +588,6 @@ $(document).ready(function() {
     });
 });
 
-// RE-RENDER LIVE UPDATE DARI REALTIME POLLING
 function renderMejaLiveUpdate(responServer) {
     var dataMeja = responServer.list_meja;
     if (!dataMeja) return;
@@ -586,7 +614,7 @@ function renderMejaLiveUpdate(responServer) {
     });
 }
 
-// REAL-TIME POLLING SINKRONISASI MEJA
+// REAL-TIME POLLING SINKRONISASI MEJA dengan Indikator Status
 $(document).ready(function() {
     const globaltoken = '<?php echo isset($_SESSION['globaltoken']) ? $_SESSION['globaltoken'] : ""; ?>';
     const targetSync = $('#target-sync').val();
@@ -611,13 +639,24 @@ $(document).ready(function() {
                     $('.badge-count.full').text(nilaiIsi);
                     
                     renderMejaLiveUpdate(respon);
+
+                    // Ubah Indikator ke Online (Hijau)
+                    $('#sync-dot').removeClass('offline').addClass('online');
+                    $('#sync-text').text('Online').css('color', '#34d399');
+                } else {
+                    // Kasus jika server membalas, tapi data tidak sesuai/error
+                    $('#sync-dot').removeClass('online').addClass('offline');
+                    $('#sync-text').text('Error Data').css('color', '#f87171');
                 }
             },
             error: function(xhr, status, error) {
                 console.error('Respon kotor / Error dari server:', xhr.responseText);
+                
+                // Ubah Indikator ke Offline (Merah)
+                $('#sync-dot').removeClass('online').addClass('offline');
+                $('#sync-text').text('Offline').css('color', '#f87171');
             },
             complete: function() {
-                // Pastikan element masih eksis di DOM sebelum loop interval berjalan lagi
                 if (document.getElementById('section-pelanggan')) {
                     setTimeout(fetchData, 5000); 
                 }
