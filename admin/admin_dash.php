@@ -33,12 +33,21 @@ $hasil=fetchOne($sql);
             <i class="fa-solid fa-shop"></i><span id="nama-toko"><?= $hasil['value']; ?></span>
         </div>
         <ul class="sidebar-menu">
-            <li class="active"><a href="#" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> Ringkasan</a></li>
-            <li><a href="#" data-target="meja"><i class="fa-solid fa-chair"></i> Denah & Meja</a></li>
-            <li><a href="#" data-target="users"><i class="fa-solid fa-users"></i> Kelola User</a></li>
-            <li><a href="#" data-target="menuharga"><i class="fa-solid fa-utensils"></i> Menu & Harga</a></li>
-            <li><a href="#" data-target="laporan"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan</a></li>
-            <li><a href="#" data-target="setting"><i class="fa-solid fa-gear"></i> Setting</a></li>
+            <?php 
+            $lastpage = $_SESSION['lastpage'] ?? 'dashboard'; // Ambil nilai lastpage dari session, default ke 'dashboard' jika tidak ada
+            $classDashboard = ($lastpage === 'dashboard') ? 'active' : '';
+            $classMeja = ($lastpage === 'meja') ? 'active' : '';
+            $classUsers = ($lastpage === 'users') ? 'active' : '';
+            $classMenuHarga = ($lastpage === 'menuharga') ? 'active' : '';
+            $classLaporan = ($lastpage === 'laporan') ? 'active' : '';
+            $classSetting = ($lastpage === 'setting') ? 'active' : '';
+            ?>
+            <li class="<?= $classDashboard; ?>"><a href="#" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> Ringkasan</a></li>
+            <li class="<?= $classMeja; ?>"><a href="#" data-target="meja"><i class="fa-solid fa-chair"></i> Denah & Meja</a></li>
+            <li class="<?= $classUsers; ?>"><a href="#" data-target="users"><i class="fa-solid fa-users"></i> Kelola User</a></li>
+            <li class="<?= $classMenuHarga; ?>"><a href="#" data-target="menuharga"><i class="fa-solid fa-utensils"></i> Menu & Harga</a></li>
+            <li class="<?= $classLaporan; ?>"><a href="#" data-target="laporan"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan</a></li>
+            <li class="<?= $classSetting; ?>"><a href="#" data-target="setting"><i class="fa-solid fa-gear"></i> Setting</a></li>
             <li><a href="#" data-target="logout"><i class="fa-solid fa-user"></i> Logout</a></li>
         </ul>
     </div>
@@ -60,7 +69,7 @@ $hasil=fetchOne($sql);
         <div class="content-body" id="content-body">
             
             <!-- 1. SECTION: DASHBOARD / RINGKASAN -->
-            <?php include 'modul/dashboard.php'; ?>
+            <?php include 'modul/'.($_SESSION['lastpage'] ?? 'dashboard') . '.php'; ?>
             
             <!-- 2. SECTION: MANAJEMEN MEJA -->
            <?php //include 'modul/meja.php'; ?>
@@ -72,7 +81,7 @@ $hasil=fetchOne($sql);
            <?php //include 'modul/laporan.php'; ?>
         </div>
     </div>
-
+<?php $_SESSION['lastpage'] = $_POST['page'] ?? 'dashboard'; ?>
     <!-- SCRIPT LOGIKAL INTERAKSI -->
     <script>
        $(document).ready(function() {
@@ -112,66 +121,6 @@ $hasil=fetchOne($sql);
                 var globaltoken = $('#globaltoken').val(); 
                 route('ubah_status_meja&id_meja=' + id_meja + '&token=' + globaltoken, 'popupcontent', '0', 'false');
             });
-            /*
-            // A. Tambah Meja Baru
-            $('#btn-tambah-meja').on('click', function() {
-                var jumlahMejaSaatIni = $('.card-meja').length;
-                var nomorMejaBaru = jumlahMejaSaatIni + 1;
-                var formatNomor = nomorMejaBaru < 10 ? '0' + nomorMejaBaru : nomorMejaBaru;
-
-                var htmlMejaBaru = `
-                    <div class="card-meja status-kosong" data-nomor="${nomorMejaBaru}">
-                        <div class="meja-actions">
-                            <button class="btn-action-meja edit" onclick="alert('Ubah setelan Meja ${formatNomor}')"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-action-meja delete btn-hapus-meja"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <div class="meja-icon"><i class="fa-solid fa-couch meja-icon-color"></i></div>
-                        <div class="meja-name">Meja ${formatNomor}</div>
-                        <span class="status-indicator status-kosong">Kosong</span>
-                        <button class="btn btn-outline btn-sm btn-ubah-status">Isi Manual</button>
-                    </div>
-                `;
-                
-                $('#box-denah-meja').append(htmlMejaBaru);
-                hitungUlangMejaTerisi();
-            });
-
-            // B. Mengubah Status Meja (Kosong <-> Terisi)
-            $(document).on('click', '.btn-ubah-status', function() {
-                var card = $(this).closest('.card-meja');
-                
-                if (card.hasClass('status-kosong')) {
-                    card.removeClass('status-kosong').addClass('status-terisi');
-                    card.find('.status-indicator').removeClass('status-kosong').addClass('status-terisi').text('Terisi (Makan)');
-                    $(this).text('Kosongkan Meja');
-                } else {
-                    card.removeClass('status-terisi').addClass('status-kosong');
-                    card.find('.status-indicator').removeClass('status-terisi').addClass('status-kosong').text('Kosong');
-                    $(this).text('Isi Manual');
-                }
-                
-                hitungUlangMejaTerisi();
-            });
-
-            // C. Hapus Meja Berdasarkan Kartu
-            $(document).on('click', '.btn-hapus-meja', function() {
-                var card = $(this).closest('.card-meja');
-                var namaMeja = card.find('.meja-name').text();
-                
-                if(confirm('Apakah Anda yakin ingin menghapus ' + namaMeja + '?')) {
-                    card.fadeOut(300, function() {
-                        $(this).remove();
-                        hitungUlangMejaTerisi();
-                    });
-                }
-            });
-
-            // D. Sinkronisasi Data Jumlah Meja Terisi ke Bagian Utama Dashboard
-            function hitungUlangMejaTerisi() {
-                var jumlahTerisi = $('.card-meja.status-terisi').length;
-                $('#stat-pending-meja').text(jumlahTerisi + " Meja");
-            }
-*/
         });
     </script>
     <script src="assets/js/lightbox.js"></script>

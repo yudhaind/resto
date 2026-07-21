@@ -13,3 +13,4 @@
         </div>
     </div>
 </div>
+<?php $_SESSION['lastpage'] = 'menuharga';

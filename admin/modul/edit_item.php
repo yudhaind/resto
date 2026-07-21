@@ -25,7 +25,7 @@ $hasil = fetchOne($sql,[$id_pr]);
 $cat = $hasil['category'];
 $status = $hasil['is_available'];
 ?>
-<h1>Tambah Produk</h1>
+<h1>Edit</h1>
 <div class="sub-popup-content">
     <form class="form-modern" action="post.php" method="POST" id="form-ubah-produk">
         <div class="form-group">
@@ -44,7 +44,7 @@ $status = $hasil['is_available'];
             <input type="text" name="namamenu" id="namamenu" placeholder="Makanan / Minuman / Desert /Snack" required value="<?= $hasil['name']; ?>">
 
             <label for="harga">Harga :</label>
-            <input type="text" name="price" id="price" onkeyup="formatRupiah(this)" maxlength="8" required placeholder="Harga" value="<?= formatRupiah($hasil['price']); ?>">
+            <input type="text" name="price" id="price" onkeyup="formatRupiah(this)" maxlength="8" required placeholder="Harga" value="<?= formatRupiah(floatval($hasil['price'])); ?>">
 
             <label for="status">Status :</label>
             <select name="status" id="status" required>
@@ -70,7 +70,8 @@ $status = $hasil['is_available'];
     let value = input.value.replace(/\D/g, '');
     
     // Ubah angka menjadi format ribuan dengan titik
-    let formatted = new Intl.NumberFormat('id-ID').format(value);
+    let formatted = new Intl.NumberFormat('id-ID',{maximumFractionDigits: 0}).format(value);
+    console.log(formatted);
     
     // Jika input kosong, tampilkan kosong, jika ada tampilkan yang sudah diformat
     input.value = value ? formatted : '';  

@@ -28,3 +28,4 @@ $result = fetchOne($sql);
 
     </div>
 </div>
+<?php $_SESSION['lastpage'] = 'setting'; ?>
