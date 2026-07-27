@@ -8,16 +8,21 @@ $sql = "SELECT COLUMN_TYPE
         AND TABLE_NAME = 'products'
         AND COLUMN_NAME = 'category'";
 $h_enum = fetchOne($sql);
-$enum_mentah = $h_enum['COLUMN_TYPE'];
-$cleaned = substr($enum_mentah, 5, -1);
-$cleaned = str_replace("'", "", $cleaned);
-$enum_array = explode(",", $cleaned);
+$enum_mentah = is_array($h_enum) && isset($h_enum['COLUMN_TYPE']) ? $h_enum['COLUMN_TYPE'] : '';
+$cleaned = '';
+if ($enum_mentah !== '') {
+    $cleaned = substr($enum_mentah, 5, -1);
+    $cleaned = str_replace("'", "", $cleaned);
+}
+$enum_array = $cleaned !== '' ? explode(",", $cleaned) : [];
 
 $sqlnt="SELECT value FROM `global_settings` WHERE `id` = 1";
 $hnt=fetchOne($sqlnt);
 
 $sqlat="SELECT value FROM `global_settings` WHERE `id` = 2";
 $hat=fetchOne($sqlat);
+$store_name = is_array($hnt) && isset($hnt['value']) ? $hnt['value'] : '';
+$store_address = is_array($hat) && isset($hat['value']) ? $hat['value'] : '';
 
 ?>
 <!DOCTYPE html>
@@ -71,8 +76,8 @@ $hat=fetchOne($sqlat);
 
 <header class="topbar">
     <div class="topbar-store-info">
-        <span class="topbar-brand"><?= $hnt['value'];?></span>
-        <span class="topbar-address"><?= $hat['value'];?></span>
+        <span class="topbar-brand"><?= htmlspecialchars($store_name, ENT_QUOTES, 'UTF-8'); ?></span>
+        <span class="topbar-address"><?= htmlspecialchars($store_address, ENT_QUOTES, 'UTF-8'); ?></span>
     </div>
     
     <div class="topbar-sync-status">
